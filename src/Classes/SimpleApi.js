@@ -74,12 +74,13 @@ export default class SimpleApi {
         };
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param numeric
      * @returns {*}
      */
-    static getClientVersion(numeric = false) {
+    getClientVersion(numeric = false) {
         return numeric ? 1:'0.0.1';
     }
 
@@ -551,7 +552,7 @@ export default class SimpleApi {
      * @returns {*}
      */
     getAvatarUrl(user, size = 32) {
-        return this._config.apiUrl + SimpleApi.processUrl(this._paths['service.avatar'], {user, size});
+        return this._config.apiUrl + this.processUrl(this._paths['service.avatar'], {user, size});
     }
 
     /**
@@ -575,7 +576,7 @@ export default class SimpleApi {
      */
     getFaviconUrl(domain, size = 32) {
         if(domain === null || domain.length === 0) domain = 'default';
-        return this._config.apiUrl + SimpleApi.processUrl(this._paths['service.favicon'], {domain, size});
+        return this._config.apiUrl + this.processUrl(this._paths['service.favicon'], {domain, size});
     }
 
     /**
@@ -608,7 +609,7 @@ export default class SimpleApi {
      */
     getPreviewUrl(domain, view = 'desktop', width = '640', height = '360...') {
         if(domain === null || domain.length === 0) domain = 'default';
-        return this._config.apiUrl + SimpleApi.processUrl(
+        return this._config.apiUrl + this.processUrl(
             this._paths['service.preview'],
             {domain, view, width, height}
         );
@@ -741,7 +742,7 @@ export default class SimpleApi {
      */
     _getRequestUrl(path) {
         if(Array.isArray(path)) {
-            path = SimpleApi.processUrl(this._paths[path[0]], path[1]);
+            path = this.processUrl(this._paths[path[0]], path[1]);
         } else {
             path = this._paths[path];
         }
@@ -841,13 +842,14 @@ export default class SimpleApi {
         return blob;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param url
      * @param component
      * @returns {*}
      */
-    static parseUrl(url, component = null) {
+    parseUrl(url, component = null) {
         if(url === undefined) return null;
         let link = document.createElement('a');
 
@@ -860,13 +862,14 @@ export default class SimpleApi {
         return link;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param url
      * @param data
      * @returns {*}
      */
-    static processUrl(url, data = {}) {
+    processUrl(url, data = {}) {
         for(let property in data) {
             if(!data.hasOwnProperty(property)) continue;
 

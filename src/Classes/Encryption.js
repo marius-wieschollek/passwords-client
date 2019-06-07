@@ -22,6 +22,14 @@ export default class Encryption {
         return this._enabled;
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
+    get keys() {
+        return Object.keys(this._keys);
+    }
+
     // noinspection JSMethodCanBeStatic
     /**
      *

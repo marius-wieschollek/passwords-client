@@ -71,7 +71,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param algorithm
      * @returns {Promise<string>}
      */
-    static getHash(value, algorithm = 'SHA-1') {
+    getHash(value, algorithm = 'SHA-1') {
         return this.config.encryption.getHash(value, algorithm);
     }
 
@@ -154,10 +154,10 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async createPassword(data = {}) {
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenPassword(object);
+            object = this.flattenPassword(object);
             object = this.validatePassword(object);
         } catch(e) {
             return this._createRejectedPromise(e);
@@ -165,7 +165,7 @@ export default class EnhancedApi extends SimpleApi {
 
         if(!object.hasOwnProperty('_encrypted')) object._encrypted = false;
         object.hash = await this.config.encryption.getHash(data.password);
-        if(!object.label) EnhancedApi._generatePasswordTitle(object);
+        if(!object.label) this._generatePasswordTitle(object);
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'password');
@@ -183,10 +183,10 @@ export default class EnhancedApi extends SimpleApi {
      */
     async updatePassword(data = {}) {
         if(!data.id) return this.createPassword(data);
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenPassword(object);
+            object = this.flattenPassword(object);
             object = this.validatePassword(object);
         } catch(e) {
             return this._createRejectedPromise(e);
@@ -194,7 +194,7 @@ export default class EnhancedApi extends SimpleApi {
 
         if(!object.hasOwnProperty('_encrypted')) object._encrypted = false;
         object.hash = await this.config.encryption.getHash(data.password);
-        if(!object.label) EnhancedApi._generatePasswordTitle(object);
+        if(!object.label) this._generatePasswordTitle(object);
 
         if(this.config.encryption.enabled && (!data.hasOwnProperty('shared') || !data.shared)) {
             this.config.encryption.encryptObject(object, 'password');
@@ -253,10 +253,10 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     createFolder(data = {}) {
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenFolder(object);
+            object = this.flattenFolder(object);
             object = this.validateFolder(object);
         } catch(e) {
             return this._createRejectedPromise(e);
@@ -278,10 +278,10 @@ export default class EnhancedApi extends SimpleApi {
      */
     updateFolder(data = {}) {
         if(!data.id) return this.createFolder(data);
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenFolder(object);
+            object = this.flattenFolder(object);
             object = this.validateFolder(object);
         } catch(e) {
             return this._createRejectedPromise(e);
@@ -344,10 +344,10 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     createTag(data = {}) {
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenTag(object);
+            object = this.flattenTag(object);
             object = this.validateTag(object);
         } catch(e) {
             return this._createRejectedPromise(e);
@@ -369,10 +369,10 @@ export default class EnhancedApi extends SimpleApi {
      */
     updateTag(data = {}) {
         if(!data.id) return this.createTag(data);
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenTag(object);
+            object = this.flattenTag(object);
             object = this.validateTag(object);
         } catch(e) {
             return this._createRejectedPromise(e);
@@ -435,10 +435,10 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     createShare(data = {}) {
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenShare(object);
+            object = this.flattenShare(object);
         } catch(e) {
             return this._createRejectedPromise(e);
         }
@@ -454,10 +454,10 @@ export default class EnhancedApi extends SimpleApi {
      */
     updateShare(data = {}) {
         if(!data.id) return this.createShare(data);
-        let object = EnhancedApi._cloneObject(data);
+        let object = this._cloneObject(data);
 
         try {
-            object = EnhancedApi.flattenShare(object);
+            object = this.flattenShare(object);
         } catch(e) {
             return this._createRejectedPromise(e);
         }
@@ -561,7 +561,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param password
      * @returns {*}
      */
-    static flattenPassword(password) {
+    flattenPassword(password) {
         if(password.folder && typeof password.folder !== 'string') {
             password.folder = password.folder.id;
         }
@@ -573,17 +573,18 @@ export default class EnhancedApi extends SimpleApi {
         if(password.edited instanceof Date) {
             password.edited = Math.floor(password.edited.getTime() / 1000);
         }
-        password = EnhancedApi._convertTags(password);
+        password = this._convertTags(password);
 
         return password;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param folder
      * @returns {*}
      */
-    static flattenFolder(folder) {
+    flattenFolder(folder) {
         if(folder.parent && typeof folder.parent !== 'string') {
             folder.parent = folder.parent.id;
         }
@@ -594,12 +595,13 @@ export default class EnhancedApi extends SimpleApi {
         return folder;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param tag
      * @returns {*}
      */
-    static flattenTag(tag) {
+    flattenTag(tag) {
         if(tag.edited instanceof Date) {
             tag.edited = Math.floor(tag.edited.getTime() / 1000);
         }
@@ -607,12 +609,13 @@ export default class EnhancedApi extends SimpleApi {
         return tag;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param share
      * @returns {*}
      */
-    static flattenShare(share) {
+    flattenShare(share) {
         if(share.expires !== null && share.expires instanceof Date) {
             share.expires = Math.floor(share.expires.getTime() / 1000);
         }
@@ -628,7 +631,7 @@ export default class EnhancedApi extends SimpleApi {
      */
     validatePassword(password, strict = false) {
         let definitions = this.getPasswordDefinition();
-        return EnhancedApi._validateObject(password, definitions, strict);
+        return this._validateObject(password, definitions, strict);
     }
 
     /**
@@ -639,7 +642,7 @@ export default class EnhancedApi extends SimpleApi {
      */
     validateFolder(folder, strict = false) {
         let definitions = this.getFolderDefinition();
-        return EnhancedApi._validateObject(folder, definitions, strict);
+        return this._validateObject(folder, definitions, strict);
     }
 
     /**
@@ -650,7 +653,7 @@ export default class EnhancedApi extends SimpleApi {
      */
     validateTag(tag, strict = false) {
         let definitions = this.getTagDefinition();
-        return EnhancedApi._validateObject(tag, definitions, strict);
+        return this._validateObject(tag, definitions, strict);
     }
 
     /**
@@ -660,7 +663,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param strict
      * @returns object
      */
-    static _validateObject(attributes, definitions, strict = false) {
+    _validateObject(attributes, definitions, strict = false) {
         let object = {};
 
         for(let property in definitions) {
@@ -696,6 +699,7 @@ export default class EnhancedApi extends SimpleApi {
         return object;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param definition
@@ -706,7 +710,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {*}
      * @private
      */
-    static _validateObjectAttributeType(definition, type, attribute, strict, property) {
+    _validateObjectAttributeType(definition, type, attribute, strict, property) {
         if(definition.type && definition.type !== type && (definition.type !== 'array' || !Array.isArray(attribute))) {
             if(!strict && definition.type === 'boolean') {
                 attribute = Boolean(attribute);
@@ -721,6 +725,7 @@ export default class EnhancedApi extends SimpleApi {
         return attribute;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param definition
@@ -731,7 +736,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {*}
      * @private
      */
-    static _validateObjectAttributeLength(definition, attribute, strict, property, type) {
+    _validateObjectAttributeLength(definition, attribute, strict, property, type) {
         if(definition.length) {
             if(Array.isArray(attribute) && attribute.length > definition.length) {
                 if(strict) throw new Error(`Property ${property} exceeds the maximum length of ${definition.length}`);
@@ -744,12 +749,13 @@ export default class EnhancedApi extends SimpleApi {
         return attribute;
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param data
      * @private
      */
-    static _convertTags(data) {
+    _convertTags(data) {
         if(data.hasOwnProperty('tags')) {
             for(let i = 0; i < data.tags.length; i++) {
                 let tag = data.tags[i];
@@ -765,7 +771,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param object
      * @private
      */
-    static _cloneObject(object) {
+    _cloneObject(object) {
         let clone = new object.constructor();
 
         for(let key in object) {
@@ -779,7 +785,7 @@ export default class EnhancedApi extends SimpleApi {
             } else if(element === null) {
                 clone[key] = null;
             } else if(typeof element === 'object') {
-                clone[key] = EnhancedApi._cloneObject(element);
+                clone[key] = this._cloneObject(element);
             } else {
                 clone[key] = element;
             }
@@ -838,9 +844,9 @@ export default class EnhancedApi extends SimpleApi {
 
         password.type = 'password';
         if(password.url) {
-            let host    = SimpleApi.parseUrl(password.url, 'host'),
-                imgHost = EnhancedApi._removeCommonSubdomains(host),
-                website = EnhancedApi._getWebsiteNameFromDomain(host);
+            let host    = this.parseUrl(password.url, 'host'),
+                imgHost = this._removeCommonSubdomains(host),
+                website = this._getWebsiteNameFromDomain(host);
             password.host = host;
             password.website = website;
             password.icon = this.getFaviconUrl(imgHost);
@@ -1025,9 +1031,9 @@ export default class EnhancedApi extends SimpleApi {
      * @returns string
      * @private
      */
-    static _generatePasswordTitle(data) {
+    _generatePasswordTitle(data) {
         if(data.url) {
-            data.label = EnhancedApi._getWebsiteNameFromDomain(SimpleApi.parseUrl(data.url, 'host'));
+            data.label = this._getWebsiteNameFromDomain(this.parseUrl(data.url, 'host'));
 
             if(data.username) {
                 let username = String(data.username);
@@ -1055,7 +1061,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param domain
      * @private
      */
-    static _getWebsiteNameFromDomain(domain) {
+    _getWebsiteNameFromDomain(domain) {
         if((domain.match(/\./g) || []).length > 2) {
             let array = domain.split('.');
             domain = '';
@@ -1066,9 +1072,10 @@ export default class EnhancedApi extends SimpleApi {
             }
         }
 
-        return EnhancedApi._removeCommonSubdomains(domain, ['www', 'www2', 'www3']);
+        return this._removeCommonSubdomains(domain, ['www', 'www2', 'www3']);
     }
 
+    // noinspection JSMethodCanBeStatic
     /**
      *
      * @param domain
@@ -1076,7 +1083,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {*}
      * @private
      */
-    static _removeCommonSubdomains(domain, extraDomains = []) {
+    _removeCommonSubdomains(domain, extraDomains = []) {
         let subdomains = ['m', 'en', 'web', 'auth', 'mail', 'email', 'login', 'signin', 'profile', 'account', navigator.language].concat(extraDomains),
             regex      = RegExp(`^(.+\\.)?(${subdomains.join('|')})\\.(.+\\..+)`);
 
@@ -1098,7 +1105,6 @@ export default class EnhancedApi extends SimpleApi {
     }
 
 
-
     /**
      * Object Definitions
      */
@@ -1108,12 +1114,15 @@ export default class EnhancedApi extends SimpleApi {
      * @returns object
      */
     getPasswordDefinition() {
-        let cseTypes = ['none'],
+        let cseKeys    = [''],
+            cseTypes   = ['none'],
             cseDefault = 'none';
 
         if(this.hasEncryption) {
             cseDefault = this.config.cseMode;
             cseTypes.push('CSEv1r1');
+            cseKeys = this.config.encryption.keys;
+            cseKeys.push('');
         }
 
         return {
@@ -1171,6 +1180,12 @@ export default class EnhancedApi extends SimpleApi {
                 type   : 'boolean',
                 default: false
             },
+            cseKey      : {
+                type   : 'string',
+                length : 36,
+                default: '',
+                allowed: cseKeys
+            },
             cseType     : {
                 type   : 'string',
                 length : 10,
@@ -1193,12 +1208,15 @@ export default class EnhancedApi extends SimpleApi {
      * @returns object
      */
     getFolderDefinition() {
-        let cseTypes = ['none'],
+        let cseKeys    = [''],
+            cseTypes   = ['none'],
             cseDefault = 'none';
 
         if(this.hasEncryption) {
             cseDefault = this.config.cseMode;
             cseTypes.push('CSEv1r1');
+            cseKeys = this.config.encryption.keys;
+            cseKeys.push('');
         }
 
         return {
@@ -1232,6 +1250,12 @@ export default class EnhancedApi extends SimpleApi {
                 type   : 'boolean',
                 default: false
             },
+            cseKey    : {
+                type   : 'string',
+                length : 36,
+                default: '',
+                allowed: cseKeys
+            },
             cseType   : {
                 type   : 'string',
                 length : 10,
@@ -1250,12 +1274,15 @@ export default class EnhancedApi extends SimpleApi {
      * @returns object
      */
     getTagDefinition() {
-        let cseTypes = ['none'],
+        let cseKeys    = [''],
+            cseTypes   = ['none'],
             cseDefault = 'none';
 
         if(this.hasEncryption) {
             cseDefault = this.config.cseMode;
             cseTypes.push('CSEv1r1');
+            cseKeys = this.config.encryption.keys;
+            cseKeys.push('');
         }
 
         return {
@@ -1288,6 +1315,12 @@ export default class EnhancedApi extends SimpleApi {
             favorite  : {
                 type   : 'boolean',
                 default: false
+            },
+            cseKey    : {
+                type   : 'string',
+                length : 36,
+                default: '',
+                allowed: cseKeys
             },
             cseType   : {
                 type   : 'string',
