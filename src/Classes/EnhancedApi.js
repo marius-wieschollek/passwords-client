@@ -85,7 +85,7 @@ export default class EnhancedApi extends SimpleApi {
     async openSession(login) {
         let password = null;
         if(login.hasOwnProperty('password')) {
-            login.secret = this.config.encryption.solveChallenge(login.password, login.salts);
+            login.challenge = this.config.encryption.solveChallenge(login.password, login.salts);
             password = login.password;
             delete login.salts;
             delete login.password;
@@ -134,7 +134,7 @@ export default class EnhancedApi extends SimpleApi {
 
         let challenge = this.config.encryption.createChallenge(password);
 
-        let result = await super.setAccountChallenge(challenge.salts, challenge.secret, oldSecret);
+        let result = await super.setAccountChallenge(challenge.secret, challenge.salts, oldSecret);
         if(result.success) {
             let keychain = this.config.encryption.getKeychain(password);
             await super.setKeychain('CSEv1r1', keychain);
