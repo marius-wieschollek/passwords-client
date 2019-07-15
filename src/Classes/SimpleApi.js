@@ -541,7 +541,7 @@ export default class SimpleApi {
      * @returns {Promise}
      */
     getAvatar(user, size = 32) {
-        return this._sendRequest(['service.avatar', {user, size}], null, 'GET', 'text');
+        return this._sendRequest(['service.avatar', {user, size}], null, 'GET', 'image/png');
     }
 
     /**
@@ -564,7 +564,7 @@ export default class SimpleApi {
      */
     getFavicon(domain, size = 32) {
         if(domain === null || domain.length === 0) domain = 'default';
-        return this._sendRequest(['service.favicon', {domain, size}], null, 'GET', 'text');
+        return this._sendRequest(['service.favicon', {domain, size}], null, 'GET', 'image/png');
     }
 
     /**
@@ -594,7 +594,7 @@ export default class SimpleApi {
             ['service.preview', {domain, view, width, height}],
             null,
             'GET',
-            'text'
+            'image/png'
         );
     }
 
@@ -691,16 +691,20 @@ export default class SimpleApi {
      * @returns {Promise}
      * @private
      */
-    async _sendRequest(path, data = null, method = null, dataType = 'json') {
+    async _sendRequest(path, data = null, method = null, dataType = 'application/json') {
         if(!this._enabled) throw new Error('API not authorized');
-        let url = this._getRequestUrl(path),
-            options = this._getRequestOptions(method, data, dataType),
-            response = await this._executeRequest(url, options),
-            contentType  = response.headers.get('content-type');
+        let url         = this._getRequestUrl(path),
+            options     = this._getRequestOptions(method, data, dataType),
+            response    = await this._executeRequest(url, options),
+            contentType = response.headers.get('content-type');
 
         this._checkSessionToken(response);
 
-        if(contentType && contentType.indexOf('application/json') !== -1) {
+        if(contentType && contentType.indexOf(dataType) === -1) {
+            let error = new Error(`Content type mismatch: Expected ${dataType}, got ${contentType}`);
+            this._config.events.emit('api.request.error', {response, error});
+            throw error;
+        } else if(contentType && contentType.indexOf('application/json') !== -1) {
             return await this._processJsonResponse(response);
         } else {
             return await this._processBinaryResponse(response);
@@ -723,9 +727,9 @@ export default class SimpleApi {
             if(!this._headers.hasOwnProperty(header)) continue;
             headers.append(header, this._headers[header]);
         }
-        headers.append('Accept', `application/${dataType}`);
+        headers.append('Accept', dataType);
 
-        let options = {method, headers, credentials: 'omit'};
+        let options = {method, headers, credentials: 'omit', redirect: 'error'};
         if(data) {
             headers.append('Content-Type', 'application/json');
             options.body = JSON.stringify(data);
@@ -759,7 +763,6 @@ export default class SimpleApi {
      * @private
      */
     async _executeRequest(url, options) {
-
         try {
             let request = new Request(url, options);
             this._config.events.emit('api.request.before', request);
@@ -810,7 +813,7 @@ export default class SimpleApi {
             throw json;
         }
 
-        this._config.events.emit('api.request.after', {response, data:json, type:'json'});
+        this._config.events.emit('api.request.after', {response, data: json, type: 'json'});
 
         return json;
     }
@@ -837,7 +840,7 @@ export default class SimpleApi {
             throw error;
         }
 
-        this._config.events.emit('api.request.after', {response, data:blob, type:'blob'});
+        this._config.events.emit('api.request.after', {response, data: blob, type: 'blob'});
 
         return blob;
     }
