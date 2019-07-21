@@ -1,3 +1,5 @@
+const config = require('../../package.json');
+
 export default class SimpleApi {
     get headers() {
         return this._headers;
@@ -81,7 +83,10 @@ export default class SimpleApi {
      * @returns {*}
      */
     getClientVersion(numeric = false) {
-        return numeric ? 1:'0.0.1';
+        if(!numeric) return config.version;
+        const [first, second, third] = config.version.split('.');
+
+        return parseInt(first + second.padStart(2, '0') + third.padStart(2, '0'));
     }
 
     /**

@@ -1,6 +1,6 @@
 {
   "name": "passwords-client",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "JS client library for the Nextcloud Passwords app",
   "main": "src/main.js",
   "author": "Marius Wieschollek",
