@@ -790,9 +790,10 @@ export default class SimpleApi {
         let sessionToken = response.headers.get('X-API-SESSION');
 
         if(sessionToken && sessionToken !== this._config.sessionToken) {
+            let oldSessionToken = this._config.sessionToken;
             this._config.sessionToken = sessionToken;
             this._headers['X-API-SESSION'] = sessionToken;
-            this._config.events.emit('api.session.token.changed', {sessionToken});
+            this._config.events.emit('api.session.token.changed', {sessionToken, oldSessionToken});
         }
     }
 

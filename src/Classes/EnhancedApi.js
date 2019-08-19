@@ -58,7 +58,7 @@ export default class EnhancedApi extends SimpleApi {
             if(e.id && e.id === '4ad27488') this._resetAuthorisation();
         });
         config.events.on('api.session.token.changed', () => {
-            this._resetAuthorisation();
+            if(d.oldSessionToken) this._resetAuthorisation();
         });
 
         super.initialize(config);
