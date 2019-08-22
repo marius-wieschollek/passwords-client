@@ -44,7 +44,7 @@ export default class Encryption {
      *
      * @param object
      * @param type
-     * @returns {Promise<*>}
+     * @returns {{_encrypted}|*}
      */
     encryptObject(object, type) {
         if(!this._enabled) throw new Error('Encryption not available');
@@ -74,7 +74,7 @@ export default class Encryption {
      *
      * @param object
      * @param type
-     * @returns {Promise<*>}
+     * @returns {{_encrypted}|*}
      */
     decryptObject(object, type) {
         if(!this._enabled) throw new Error('Encryption not available');

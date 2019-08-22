@@ -196,7 +196,7 @@ export default class EnhancedApi extends SimpleApi {
         object.hash = await this.config.encryption.getHash(data.password);
         if(!object.label) this._generatePasswordTitle(object);
 
-        if(this.config.encryption.enabled && (!data.hasOwnProperty('shared') || !data.shared)) {
+        if(this.config.encryption.enabled && object.cseType !== 'none' && (!data.hasOwnProperty('shared') || !data.shared)) {
             this.config.encryption.encryptObject(object, 'password');
         }
 
@@ -262,7 +262,7 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled) {
+        if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'folder');
         }
 
@@ -287,7 +287,7 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled) {
+        if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'folder');
         }
 
@@ -353,7 +353,7 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled) {
+        if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'tag');
         }
 
@@ -378,7 +378,7 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled) {
+        if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'tag');
         }
 
