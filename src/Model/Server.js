@@ -7,6 +7,8 @@ import PasswordRepository from '../Repositories/PasswordRepository';
 import Session from './Session';
 import SessionAuthorisation from '../Authorisation/SessionAuthorisation';
 import CSEv1Encryption from '../Encryption/CSEv1Encryption';
+import FolderRepository from '../Repositories/FolderRepository';
+import TagRepository from '../Repositories/TagRepository';
 
 export default class Server extends AbstractModel {
 
@@ -26,6 +28,8 @@ export default class Server extends AbstractModel {
         this._session = new Session()
             .setUser(this.getUser())
             .setToken(this.getToken());
+        this._tagRepository = null;
+        this._folderRepository = null;
         this._passwordRepository = null;
         this._sessionAuthorisation = null;
         this._classes = [];
@@ -95,6 +99,30 @@ export default class Server extends AbstractModel {
         }
 
         return this._passwordRepository;
+    }
+
+    /**
+     *
+     * @returns {FolderRepository}
+     */
+    getFolderRepository() {
+        if(this._folderRepository === null) {
+            this._folderRepository = new FolderRepository(this, new Cache());
+        }
+
+        return this._folderRepository;
+    }
+
+    /**
+     *
+     * @returns {TagRepository}
+     */
+    getTagRepository() {
+        if(this._tagRepository === null) {
+            this._tagRepository = new TagRepository(this, new Cache());
+        }
+
+        return this._tagRepository;
     }
 
     /**

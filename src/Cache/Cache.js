@@ -24,6 +24,10 @@ export default class Cache {
         delete this._data[key];
     }
 
+    clear() {
+        this._data = {};
+    }
+
     getByType(type) {
         let results = [];
         for(let key in this._data) {

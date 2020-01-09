@@ -14,6 +14,16 @@ export default class PasswordRepository {
 
     /**
      *
+     * @return {PasswordRepository}
+     */
+    clearCache() {
+        this._cache.clear();
+
+        return this;
+    }
+
+    /**
+     *
      * @param {Password} password
      * @returns {Promise<Password>}
      */
