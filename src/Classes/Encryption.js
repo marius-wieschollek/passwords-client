@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers";
+import sodium from 'libsodium-wrappers';
 
 export default class Encryption {
 
@@ -11,6 +11,7 @@ export default class Encryption {
         this._enabled = false;
         this._keys = {};
         this._current = '';
+        this._legacyEncoding = false;
         this.ready();
     }
 
@@ -37,6 +38,15 @@ export default class Encryption {
      */
     async ready() {
         await sodium.ready;
+    }
+
+    /**
+     * Returns true if the user has base64 encoded properties
+     *
+     * @return {boolean}
+     */
+    hasLegacyEncoding() {
+        return this._legacyEncoding;
     }
 
     /**
@@ -106,8 +116,8 @@ export default class Encryption {
      * @returns {*}
      */
     encryptWithPassword(message, password) {
-        let salt = this._generateRandom(sodium.crypto_pwhash_SALTBYTES),
-            key  = this._passwordToKey(password, salt),
+        let salt      = this._generateRandom(sodium.crypto_pwhash_SALTBYTES),
+            key       = this._passwordToKey(password, salt),
             encrypted = this.encrypt(message, key);
 
         return sodium.to_hex(new Uint8Array([...salt, ...encrypted]));
@@ -164,9 +174,11 @@ export default class Encryption {
         try {
             let encryptedString = sodium.from_hex(encodedString);
             return sodium.to_string(this.decrypt(encryptedString, key));
-        }catch(e) {
+        } catch(e) {
             let encryptedString = sodium.from_base64(encodedString);
-            return sodium.to_string(this.decrypt(encryptedString, key));
+            let result = sodium.to_string(this.decrypt(encryptedString, key));
+            this._legacyEncoding = true;
+            return result;
         }
     }
 
@@ -258,7 +270,7 @@ export default class Encryption {
                 sodium.to_hex(passwordHashSalt)
             ],
             secret: sodium.to_hex(passwordHash)
-        }
+        };
     }
 
     /**
@@ -272,13 +284,14 @@ export default class Encryption {
         try {
             encrypted = sodium.from_hex(keychainText);
         } catch(e) {
-            encrypted = sodium.from_base64(keychainText)
+            encrypted = sodium.from_base64(keychainText);
+            this._legacyEncoding = true;
         }
 
-        let salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
-            text      = encrypted.slice(sodium.crypto_pwhash_SALTBYTES),
-            key       = this._passwordToKey(password, salt),
-            keychain  = JSON.parse(sodium.to_string(this.decrypt(text, key)));
+        let salt     = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
+            text     = encrypted.slice(sodium.crypto_pwhash_SALTBYTES),
+            key      = this._passwordToKey(password, salt),
+            keychain = JSON.parse(sodium.to_string(this.decrypt(text, key)));
 
         this._current = keychain.current;
         for(let id in keychain.keys) {
@@ -303,16 +316,19 @@ export default class Encryption {
      * Add a new key to the keychain and return the full keychain
      *
      * @param password
+     * @param addKey
      * @returns {*}
      */
-    getKeychain(password) {
+    getKeychain(password, addKey = false) {
         if(this._enabled === false) {
             this._keys = {};
         }
 
-        this._current = this.getUuid();
-        this._keys[this._current] = this._generateRandom(sodium.crypto_secretbox_KEYBYTES);
-        this._enabled = true;
+        if(addKey || this._current.length === 0) {
+            this._current = this.getUuid();
+            this._keys[this._current] = this._generateRandom(sodium.crypto_secretbox_KEYBYTES);
+            this._enabled = true;
+        }
 
         let keychain = {
             keys   : {},
