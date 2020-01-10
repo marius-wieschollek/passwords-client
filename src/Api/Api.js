@@ -76,7 +76,7 @@ export default class Api {
     }
 
     emit(event, data) {
-        this._events.event(event, data);
+        this._events.emit(event, data);
     }
 
     /**
