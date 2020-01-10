@@ -1,5 +1,6 @@
 import Properties from '../Configuration/Password';
 import AbstractModel from './AbstractModel';
+import Url from 'url-parse';
 
 export default class Password extends AbstractModel {
 
@@ -219,6 +220,25 @@ export default class Password extends AbstractModel {
      */
     getServer() {
         return this._api.getServer();
+    }
+
+    /**
+     *
+     * @param {number} [size=32]
+     * @return {string}
+     */
+    getFaviconUrl(size = 32) {
+        let host = 'default';
+
+        if(this.getUrl()) {
+            let url = Url(this.getUrl());
+
+            if(url.host.length !== 0) {
+                host = url.host;
+            }
+        }
+
+        return `${this.getServer().getApiUrl()}api/1.0/service/favicon/${host}/${size}`;
     }
 
     /**
