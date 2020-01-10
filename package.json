@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "eventemitter3": "^3.1.2",
-    "libsodium-wrappers": "^0.7.5"
+    "libsodium-wrappers": "^0.7.6"
   }
 }
