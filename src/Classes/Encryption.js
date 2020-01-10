@@ -110,7 +110,7 @@ export default class Encryption {
             key  = this._passwordToKey(password, salt),
             encrypted = this.encrypt(message, key);
 
-        return sodium.to_base64(new Uint8Array([...salt, ...encrypted]));
+        return sodium.to_hex(new Uint8Array([...salt, ...encrypted]));
     }
 
     /**
@@ -121,7 +121,7 @@ export default class Encryption {
      * @returns {*}
      */
     decryptWithPassword(message, password) {
-        let encrypted = sodium.from_base64(message),
+        let encrypted = sodium.from_hex(message),
             salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
             text      = encrypted.slice(sodium.crypto_pwhash_SALTBYTES),
             key       = this._passwordToKey(password, salt);
@@ -130,14 +130,14 @@ export default class Encryption {
     }
 
     /**
-     * Encrypt the message with the given key and return a base64 encoded string
+     * Encrypt the message with the given key and return a hex encoded string
      *
      * @param message
      * @param key
      * @returns {string}
      */
     encryptString(message, key) {
-        return sodium.to_base64(this.encrypt(message, key));
+        return sodium.to_hex(this.encrypt(message, key));
     }
 
     /**
@@ -154,15 +154,20 @@ export default class Encryption {
     }
 
     /**
-     * Decrypt the base64 encoded message with the given key
+     * Decrypt the hex or base64 encoded message with the given key
      *
      * @param encodedString
      * @param key
      * @returns {string}
      */
     decryptString(encodedString, key) {
-        let encryptedString = sodium.from_base64(encodedString);
-        return sodium.to_string(this.decrypt(encryptedString, key));
+        try {
+            let encryptedString = sodium.from_hex(encodedString);
+            return sodium.to_string(this.decrypt(encryptedString, key));
+        }catch(e) {
+            let encryptedString = sodium.from_base64(encodedString);
+            return sodium.to_string(this.decrypt(encryptedString, key));
+        }
     }
 
     // noinspection JSMethodCanBeStatic
@@ -263,8 +268,14 @@ export default class Encryption {
      * @param password
      */
     setKeychain(keychainText, password) {
-        let encrypted = sodium.from_base64(keychainText),
-            salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
+        let encrypted;
+        try {
+            encrypted = sodium.from_hex(keychainText);
+        } catch(e) {
+            encrypted = sodium.from_base64(keychainText)
+        }
+
+        let salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
             text      = encrypted.slice(sodium.crypto_pwhash_SALTBYTES),
             key       = this._passwordToKey(password, salt),
             keychain  = JSON.parse(sodium.to_string(this.decrypt(text, key)));
@@ -318,7 +329,7 @@ export default class Encryption {
             key       = this._passwordToKey(password, salt),
             encrypted = this.encrypt(JSON.stringify(keychain), key);
 
-        return sodium.to_base64(new Uint8Array([...salt, ...encrypted]));
+        return sodium.to_hex(new Uint8Array([...salt, ...encrypted]));
     }
 
     /**
