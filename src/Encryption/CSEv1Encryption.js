@@ -76,7 +76,7 @@ export default class CSEv1Encryption {
     }
 
     /**
-     * Encrypt the message with the given key and return a base64 encoded string
+     * Encrypt the message with the given key and return a hex encoded string
      *
      * @param {string} message
      * @param {Uint8Array} key
@@ -84,11 +84,11 @@ export default class CSEv1Encryption {
      * @private
      */
     _encryptString(message, key) {
-        return sodium.to_base64(this._encrypt(message, key));
+        return sodium.to_hex(this._encrypt(message, key));
     }
 
     /**
-     * Decrypt the base64 encoded message with the given key
+     * Decrypt the hex or base64 encoded message with the given key
      *
      * @param {string} encodedString
      * @param {Uint8Array} key
@@ -96,8 +96,13 @@ export default class CSEv1Encryption {
      * @private
      */
     _decryptString(encodedString, key) {
-        let encryptedString = sodium.from_base64(encodedString);
-        return sodium.to_string(this._decrypt(encryptedString, key));
+        try {
+            let encryptedString = sodium.from_hex(encodedString);
+            return sodium.to_string(this.decrypt(encryptedString, key));
+        } catch(e) {
+            let encryptedString = sodium.from_base64(encodedString);
+            return sodium.to_string(this._decrypt(encryptedString, key));
+        }
     }
 
     /**

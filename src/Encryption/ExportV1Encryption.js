@@ -15,7 +15,7 @@ export default class ExportV1Encryption extends CSEv1Encryption {
             key       = this._passwordToKey(password, salt),
             encrypted = this._encrypt(message, key);
 
-        return sodium.to_base64(new Uint8Array([...salt, ...encrypted]));
+        return sodium.to_hex(new Uint8Array([...salt, ...encrypted]));
     }
 
     /**
@@ -26,7 +26,7 @@ export default class ExportV1Encryption extends CSEv1Encryption {
      * @returns {*}
      */
     decryptWithPassword(message, password) {
-        let encrypted = sodium.from_base64(message),
+        let encrypted = sodium.from_hex(message),
             salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
             text      = encrypted.slice(sodium.crypto_pwhash_SALTBYTES),
             key       = this._passwordToKey(password, salt);

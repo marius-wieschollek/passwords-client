@@ -74,8 +74,14 @@ export default class CSEv1Keychain {
      * @param {string} keychainText
      */
     import(keychainText) {
-        let encrypted = sodium.from_base64(keychainText),
-            salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
+        let encrypted;
+        try {
+            encrypted = sodium.from_hex(keychainText);
+        } catch(e) {
+            encrypted = sodium.from_base64(keychainText);
+        }
+
+        let salt      = encrypted.slice(0, sodium.crypto_pwhash_SALTBYTES),
             text      = encrypted.slice(sodium.crypto_pwhash_SALTBYTES),
             key       = this._passwordToKey(this._password, salt),
             keychain  = JSON.parse(sodium.to_string(this._decrypt(text, key)));
@@ -112,7 +118,7 @@ export default class CSEv1Keychain {
             key       = this._passwordToKey(this._password, salt),
             encrypted = this._encrypt(JSON.stringify(keychain), key);
 
-        return sodium.to_base64(new Uint8Array([...salt, ...encrypted]));
+        return sodium.to_hex(new Uint8Array([...salt, ...encrypted]));
     }
 
     /**
