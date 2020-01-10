@@ -20,6 +20,19 @@ import ResponseContentTypeError from '../Exception/ResponseContentTypeError';
 import ResponseDecodingError from '../Exception/ResponseDecodingError';
 import UnknownPropertyError from '../Exception/UnknownPropertyError';
 import ObjectMerger from '../Utility/ObjectMerger';
+import BadRequestError from '../Exception/Http/BadRequestError';
+import UnauthorizedError from '../Exception/Http/UnauthorizedError';
+import ForbiddenError from '../Exception/Http/ForbiddenError';
+import NotFoundError from '../Exception/Http/NotFoundError';
+import TooManyRequestsError from '../Exception/Http/TooManyRequestsError';
+import MethodNotAllowedError from '../Exception/Http/MethodNotAllowedError';
+import InternalServerError from '../Exception/Http/InternalServerError';
+import BadGatewayError from '../Exception/Http/BadGatewayError';
+import ServiceUnavailableError from '../Exception/Http/ServiceUnavailableError';
+import GatewayTimeoutError from '../Exception/Http/GatewayTimeoutError';
+import NetworkError from '../Exception/NetworkError';
+import HttpError from '../Exception/Http/HttpError';
+import EventEmitter from 'eventemitter3';
 
 export default class Api {
 
@@ -47,6 +60,23 @@ export default class Api {
 
         this._server = server;
         this._session = this.getInstance('model.session', server.getUser(), server.getToken());
+        this._events = this.getInstance('event.event');
+    }
+
+    on(event, listener) {
+        this._events.on(event, listener);
+    }
+
+    once(event, listener) {
+        this._events.once(event, listener);
+    }
+
+    off(event, listener) {
+        this._events.off(event, listener);
+    }
+
+    emit(event, data) {
+        this._events.event(event, data);
     }
 
     /**
@@ -62,9 +92,7 @@ export default class Api {
      * @returns {ApiRequest}
      */
     getRequest() {
-        return this.getClass('network.request', this)
-            .setUrl(this._server.getApiUrl())
-            .setSession(this.getSession());
+        return this.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
     }
 
     /**
@@ -206,11 +234,26 @@ export default class Api {
             state        : {
                 boolean: BooleanState
             },
+            event        : {
+                event: EventEmitter
+            },
             exception    : {
                 configuration: ConfigurationError,
                 contenttype  : ResponseContentTypeError,
                 decoding     : ResponseDecodingError,
-                property     : UnknownPropertyError
+                property     : UnknownPropertyError,
+                network      : NetworkError,
+                http         : HttpError,
+                400          : BadRequestError,
+                401          : UnauthorizedError,
+                403          : ForbiddenError,
+                404          : NotFoundError,
+                405          : MethodNotAllowedError,
+                429          : TooManyRequestsError,
+                500          : InternalServerError,
+                502          : BadGatewayError,
+                503          : ServiceUnavailableError,
+                504          : GatewayTimeoutError
             }
         };
     }

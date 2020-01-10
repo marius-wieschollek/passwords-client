@@ -1,20 +1,20 @@
 import ApiResponse from './ApiResponse';
-import ResponseContentTypeError from '../Exception/ResponseContentTypeError';
 
 export default class ApiRequest {
 
-    constructor() {
-        this._url = null;
+    constructor(api, url = null, session = null) {
+        this._api = api;
+        this._url = url;
         this._path = null;
         this._data = null;
-        this._session = null;
+        this._session = session;
         this._responseType = 'application/json';
     }
 
     setUrl(value) {
         this._url = value;
 
-        return this
+        return this;
     }
 
     /**
@@ -32,19 +32,19 @@ export default class ApiRequest {
     setSession(value) {
         this._session = value;
 
-        return this
+        return this;
     }
 
     setPath(value) {
         this._path = value;
 
-        return this
+        return this;
     }
 
     setData(value) {
         this._data = value;
 
-        return this
+        return this;
     }
 
     /**
@@ -66,21 +66,23 @@ export default class ApiRequest {
         this._session.setId(httpResponse.headers.get('x-api-session'));
 
         if(expectedContentType !== null && contentType && contentType.indexOf(expectedContentType) === -1) {
-            throw new ResponseContentTypeError(`Expected ${expectedContentType}, got ${contentType}`, response);
+            let error = this._api.getClass('exception.contenttype', expectedContentType, contentType, httpResponse);
+            this._api.emit('request.error', error);
+            throw error;
         } else if(contentType && contentType.indexOf('application/json') !== -1) {
             await this._processJsonResponse(httpResponse, response);
         } else {
             await this._processBinaryResponse(httpResponse, response);
         }
 
-        //this._events.emit('api.request.after', response);
+        this._api.emit('request.after', response);
 
-        return response
+        return response;
     }
 
     _getRequestOptions() {
         let headers = this._getRequestHeaders();
-        let method  = 'GET';
+        let method = 'GET';
         let options = {method, headers, credentials: 'omit', redirect: 'error'};
         if(this._data !== null) {
             options.body = JSON.stringify(this._data);
@@ -95,9 +97,9 @@ export default class ApiRequest {
         let headers = new Headers();
 
         if(this._session.getUser() !== null) {
-            headers.append('authorization',  `Basic ${btoa(`${this._session.getUser()}:${this._session.getToken()}`)}`);
+            headers.append('authorization', `Basic ${btoa(`${this._session.getUser()}:${this._session.getToken()}`)}`);
         } else if(this._session.getToken() !== null) {
-            headers.append('authorization',  `Bearer ${btoa(this._session.getToken())}`);
+            headers.append('authorization', `Bearer ${btoa(this._session.getToken())}`);
         }
 
         headers.append('accept', this._responseType);
@@ -123,10 +125,11 @@ export default class ApiRequest {
     async _executeRequest(url, options) {
         try {
             let request = new Request(url, options);
+            this._api.emit('request.before', request);
 
             return await fetch(request);
         } catch(e) {
-            //this._config.events.emit('api.request.error', e);
+            this._api.emit('request.error', e);
             throw e;
         }
     }
@@ -138,21 +141,20 @@ export default class ApiRequest {
      * @private
      */
     async _processJsonResponse(httpResponse, response) {
+        if(!httpResponse.ok) {
+            let error = this._getHttpError(httpResponse);
+            this._api.emit('request.error', error);
+            throw error;
+        }
+
         try {
             let json = await httpResponse.json();
-            response.setData(json)
+            response.setData(json);
         } catch(e) {
-            e.response = httpResponse;
-            //this._config.events.emit('api.response.decoding.error', e);
-            throw e;
+            let error = this._api.getClass('exception.decoding', httpResponse, e);
+            this._api.emit('request.decoding.error', error);
+            throw error;
         }
-
-        if(!httpResponse.ok) {
-            json.response = httpResponse;
-            //this._config.events.emit('api.request.error', json);
-            throw json;
-        }
-
     }
 
     /**
@@ -162,18 +164,35 @@ export default class ApiRequest {
      * @private
      */
     async _processBinaryResponse(httpResponse, response) {
+        if(!httpResponse.ok) {
+            let error = this._getHttpError(httpResponse);
+            this._api.emit('request.error', error);
+            throw error;
+        }
+
         try {
             let blob = await httpResponse.blob();
-            response.setData(blob)
+            response.setData(blob);
         } catch(e) {
-            //this._config.events.emit('api.response.decoding.error', e);
-            throw e;
+            let error = this._api.getClass('exception.decoding', httpResponse, e);
+            this._api.emit('request.decoding.error', error);
+            throw error;
+        }
+    }
+
+    /**
+     *
+     * @param {Response} response
+     * @private
+     */
+    _getHttpError(response) {
+        if([400, 401, 403, 404, 405, 429, 500, 502, 503, 504].indexOf(response.status) !== -1) {
+            return this._api.getClass(`exception.${response.status}`, response);
+        }
+        if(response.status > 99) {
+            return this._api.getClass('exception.http', response);
         }
 
-        if(!httpResponse.ok) {
-
-            //this._config.events.emit('api.request.error', error);
-            throw new Error('!httpResponse.ok');
-        }
+        return this._api.getClass('exception.network', response);
     }
 }

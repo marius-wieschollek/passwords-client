@@ -1,5 +1,13 @@
 export default class ResponseDecodingError extends Error {
 
+    get response() {
+        return this._response;
+    }
+
+    get error() {
+        return this._error;
+    }
+
     constructor(response, error, message = '') {
 
         if(message.length === 0) {
@@ -8,7 +16,7 @@ export default class ResponseDecodingError extends Error {
 
         super(message);
 
-        this.response = response;
-        this.error = error;
+        this._response = response;
+        this._error = error;
     }
 }
