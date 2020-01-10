@@ -8,7 +8,6 @@ export default class ApiRequest {
         this._path = null;
         this._data = null;
         this._session = null;
-        this._sessionToken = null;
         this._responseType = 'application/json';
     }
 

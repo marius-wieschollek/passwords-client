@@ -1,10 +1,10 @@
 export default class Session {
 
-    constructor() {
-        this._user = null;
-        this._token = null;
-        this._id = null;
-        this._authorized = false;
+    constructor(user = null, token = null, id = null, authorized = false) {
+        this._user = user;
+        this._token = token;
+        this._id = id;
+        this._authorized = authorized;
     }
 
     getUser() {

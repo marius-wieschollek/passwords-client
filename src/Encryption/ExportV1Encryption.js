@@ -1,8 +1,7 @@
 import sodium from 'libsodium-wrappers';
 import CSEv1Encryption from './CSEv1Encryption';
 
-export default class ExportV1Encryption extends CSEv1Encryption{
-
+export default class ExportV1Encryption extends CSEv1Encryption {
 
     /**
      * Encrypts the message with the user defined password
@@ -12,8 +11,8 @@ export default class ExportV1Encryption extends CSEv1Encryption{
      * @returns {*}
      */
     encryptWithPassword(message, password) {
-        let salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES),
-            key  = this._passwordToKey(password, salt),
+        let salt      = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES),
+            key       = this._passwordToKey(password, salt),
             encrypted = this._encrypt(message, key);
 
         return sodium.to_base64(new Uint8Array([...salt, ...encrypted]));

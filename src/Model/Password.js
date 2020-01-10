@@ -5,12 +5,12 @@ export default class Password extends AbstractModel {
 
     /**
      *
-     * @param {Server} server
+     * @param {Api} api
      * @param {Object} [data={}]
      */
-    constructor(server, data = {}) {
+    constructor(api, data = {}) {
         super(Properties, data);
-        this._server = server;
+        this._api = api;
     }
 
     getId() {
@@ -218,15 +218,7 @@ export default class Password extends AbstractModel {
      * @returns {Server}
      */
     getServer() {
-        return this._server;
-    }
-
-    /**
-     *
-     * @param {Server} value
-     */
-    setServer(value) {
-        this._server = value;
+        return this._api.getServer();
     }
 
     /**

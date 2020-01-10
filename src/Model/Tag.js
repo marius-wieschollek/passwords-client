@@ -5,12 +5,12 @@ export default class Tag extends AbstractModel {
 
     /**
      *
-     * @param {Server} server
+     * @param {Api} api
      * @param {Object} [data={}]
      */
-    constructor(server, data = {}) {
+    constructor(api, data = {}) {
         super(Properties, data);
-        this._server = server;
+        this._api = api;
     }
 
     getId() {
@@ -42,20 +42,12 @@ export default class Tag extends AbstractModel {
      * @returns {Server}
      */
     getServer() {
-        return this._server;
+        return this._api.getServer();
     }
 
     /**
      *
-     * @param {Server} value
-     */
-    setServer(value) {
-        this._server = value;
-    }
-
-    /**
-     *
-     * @returns {Promise<Folder[]>}
+     * @returns {Promise<Tag[]>}
      */
     async fetchRevisions() {
 

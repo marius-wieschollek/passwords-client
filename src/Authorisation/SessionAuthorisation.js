@@ -5,16 +5,16 @@ export default class SessionAuthorisation {
 
     /**
      *
-     * @param {Server} server
+     * @param {Api} api
      */
-    constructor(server) {
-        this._server = server;
+    constructor(api) {
+        this._api = api;
         this._challenge = null;
         this._token = null;
     }
 
     async load() {
-        let response = await this._server.createRequest()
+        let response = await this._api.getRequest()
             .setPath('api/1.0/session/request')
             .send();
 
@@ -58,7 +58,7 @@ export default class SessionAuthorisation {
             }
         }
 
-        let request = await this._server.createRequest()
+        let request = await this._api.getRequest()
             .setPath('api/1.0/session/open')
             .setData(data);
 
@@ -66,7 +66,7 @@ export default class SessionAuthorisation {
         if(response.getData().success) {
             if(this.hasChallenge()) {
                 let keychain = new CSEv1Keychain(response.getData().keys.CSEv1r1, this._challenge.getPassword());
-                this._server.getCseV1Encryption().setKeychain(keychain);
+                this._api.getCseV1Encryption().setKeychain(keychain);
             }
             request.getSession().setAuthorized(true);
         }

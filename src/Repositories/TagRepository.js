@@ -4,11 +4,11 @@ export default class TagRepository {
 
     /**
      *
-     * @param {Server} server
+     * @param {Api} api
      * @param {Cache} cache
      */
-    constructor(server, cache) {
-        this._server = server;
+    constructor(api, cache) {
+        this._api = api;
         this._cache = cache;
     }
 
@@ -58,7 +58,7 @@ export default class TagRepository {
             return this._cache.get(id);
         }
 
-        let request = this._server.createRequest()
+        let request = this._api.getRequest()
             .setPath('api/1.0/tag/show')
             .setData({id});
 
@@ -79,7 +79,7 @@ export default class TagRepository {
             return this._cache.getByType('tag');
         }
 
-        let request = this._server.createRequest()
+        let request = this._api.getRequest()
             .setPath('api/1.0/tag/list');
 
         let response = await request.send();
@@ -102,10 +102,10 @@ export default class TagRepository {
      */
     async _dataToModel(data) {
         if(data.cseType === 'CSEv1r1') {
-            data = await this._server.getCseV1Encryption().decrypt(data, 'tag');
+            data = await this._api.getCseV1Encryption().decrypt(data, 'tag');
         }
 
-        let tag = new Tag(this._server, data);
+        let tag = this._api.getClass('model.tag', this._api, data);
         this._cache.set(tag.getId(), tag, 'tag');
 
         return tag
