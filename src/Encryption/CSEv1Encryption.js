@@ -98,7 +98,7 @@ export default class CSEv1Encryption {
     _decryptString(encodedString, key) {
         try {
             let encryptedString = sodium.from_hex(encodedString);
-            return sodium.to_string(this.decrypt(encryptedString, key));
+            return sodium.to_string(this._decrypt(encryptedString, key));
         } catch(e) {
             let encryptedString = sodium.from_base64(encodedString);
             return sodium.to_string(this._decrypt(encryptedString, key));
