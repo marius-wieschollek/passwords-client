@@ -87,7 +87,11 @@ export default class FolderRepository {
 
         let result = [];
         for(let data of folders) {
-            result.push(await this._dataToModel(data));
+            try {
+                result.push(await this._dataToModel(data));
+            } catch(e) {
+                console.error(e, data);
+            }
         }
         this._cache.set('folders.list', true);
 

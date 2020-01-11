@@ -16,7 +16,7 @@
     "url": "https://git.mdns.eu/nextcloud/passwords-client.git"
   },
   "dependencies": {
-    "eventemitter3": "^3.1.2",
+    "eventemitter3": "^4.0.0",
     "libsodium-wrappers": "^0.7.6",
     "url-parse": "^1.4.7",
     "uuidv4": "^4.0.0"

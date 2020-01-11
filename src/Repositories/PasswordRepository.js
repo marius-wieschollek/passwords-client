@@ -87,7 +87,11 @@ export default class PasswordRepository {
 
         let result = [];
         for(let data of passwords) {
-            result.push(await this._dataToModel(data));
+            try {
+                result.push(await this._dataToModel(data));
+            } catch(e) {
+                console.error(e, data);
+            }
         }
         this._cache.set('passwords.list', true);
 
@@ -102,11 +106,7 @@ export default class PasswordRepository {
      */
     async _dataToModel(data) {
         if(data.cseType === 'CSEv1r1') {
-            try {
-                data = await this._api.getCseV1Encryption().decrypt(data, 'password');
-            } catch(e) {
-                console.error(e, data);
-            }
+            data = await this._api.getCseV1Encryption().decrypt(data, 'password');
         }
 
         let password = this._api.getClass('model.password', this._api, data);

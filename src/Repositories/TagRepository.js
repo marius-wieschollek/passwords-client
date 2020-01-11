@@ -87,7 +87,11 @@ export default class TagRepository {
 
         let result = [];
         for(let data of tags) {
-            result.push(await this._dataToModel(data));
+            try {
+                result.push(await this._dataToModel(data));
+            } catch(e) {
+                console.error(e, data);
+            }
         }
         this._cache.set('tags.list', true);
 
