@@ -102,7 +102,11 @@ export default class PasswordRepository {
      */
     async _dataToModel(data) {
         if(data.cseType === 'CSEv1r1') {
-            data = await this._api.getCseV1Encryption().decrypt(data, 'password');
+            try {
+                data = await this._api.getCseV1Encryption().decrypt(data, 'password');
+            } catch(e) {
+                console.error(e, data);
+            }
         }
 
         let password = this._api.getClass('model.password', this._api, data);

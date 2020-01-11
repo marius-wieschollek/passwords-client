@@ -22,6 +22,9 @@ export default class BooleanState {
             promise: null,
             resolve: null
         };
+        this._onTrue = [];
+        this._onFalse = [];
+        this._onChange = [];
     }
 
     get() {
@@ -85,6 +88,54 @@ export default class BooleanState {
 
     /**
      *
+     * @param {Function} callback
+     */
+    onTrue(callback) {
+        this._onTrue.push(callback);
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    offTrue(callback) {
+        this._off('_onTrue', callback);
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    onFalse(callback) {
+        this._onFalse.push(callback);
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    offFalse(callback) {
+        this._off('_onFalse', callback);
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    onChange(callback) {
+        this._onChange.push(callback);
+    }
+
+    /**
+     *
+     * @param {Function} callback
+     */
+    offChange(callback) {
+        this._off('_onChange', callback);
+    }
+
+    /**
+     *
      * @returns {boolean}
      */
     toJSON() {
@@ -97,14 +148,41 @@ export default class BooleanState {
      */
     _notify() {
         if(this._value) {
-            if(this._true.promise !== null) this._true.resolve();
+            if(this._true.promise !== null) this._true.resolve(this);
             this._true.promise = null;
+            this._notifyEvents('_onTrue');
         } else {
-            if(this._false.promise !== null) this._true.resolve();
+            if(this._false.promise !== null) this._false.resolve(this);
             this._false.promise = null;
+            this._notifyEvents('_onFalse');
         }
 
-        if(this._change.promise !== null) this._change.resolve();
+        if(this._change.promise !== null) this._change.resolve(this, this._value);
         this._change.promise = null;
+        this._notifyEvents('_onChange');
+    }
+
+    /**
+     *
+     * @param {string} event
+     * @private
+     */
+    _notifyEvents(event) {
+        for(let callback of this[event]) {
+            callback(this, this._value);
+        }
+    }
+
+    /**
+     *
+     * @param {string} event
+     * @param {Function} callback
+     * @private
+     */
+    _off(event, callback) {
+        let index = this[event].indexOf(callback);
+        if(index !== -1) {
+            this[event].splice(index, 1);
+        }
     }
 }

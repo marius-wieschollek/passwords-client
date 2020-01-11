@@ -1,6 +1,6 @@
 import Cache from '../Cache/Cache';
 import PasswordRepository from '../Repositories/PasswordRepository';
-import SessionAuthorisation from '../Authorisation/SessionAuthorisation';
+import SessionAuthorization from '../Authorization/SessionAuthorization';
 import CSEv1Encryption from '../Encryption/CSEv1Encryption';
 import FolderRepository from '../Repositories/FolderRepository';
 import TagRepository from '../Repositories/TagRepository';
@@ -13,7 +13,7 @@ import Session from '../Model/Session';
 import ApiResponse from '../Network/ApiResponse';
 import ExportV1Encryption from '../Encryption/ExportV1Encryption';
 import CSEv1Keychain from '../Encryption/Keychain/CSEv1Keychain';
-import PWDv1Challenge from '../Authorisation/Challenge/PWDv1Challenge';
+import PWDv1Challenge from '../Authorization/Challenge/PWDv1Challenge';
 import BooleanState from '../State/BooleanState';
 import ConfigurationError from '../Exception/ConfigruationError';
 import ResponseContentTypeError from '../Exception/ResponseContentTypeError';
@@ -33,6 +33,8 @@ import GatewayTimeoutError from '../Exception/Http/GatewayTimeoutError';
 import NetworkError from '../Exception/NetworkError';
 import HttpError from '../Exception/Http/HttpError';
 import EventEmitter from 'eventemitter3';
+import UserToken from '../Authorization/Token/UserToken';
+import RequestToken from '../Authorization/Token/RequestToken';
 
 export default class Api {
 
@@ -63,18 +65,38 @@ export default class Api {
         this._events = this.getInstance('event.event');
     }
 
+    /**
+     *
+     * @param {string} event
+     * @param {Function} listener
+     */
     on(event, listener) {
         this._events.on(event, listener);
     }
 
+    /**
+     *
+     * @param {string} event
+     * @param {Function} listener
+     */
     once(event, listener) {
         this._events.once(event, listener);
     }
 
+    /**
+     *
+     * @param {string} event
+     * @param {Function} listener
+     */
     off(event, listener) {
         this._events.off(event, listener);
     }
 
+    /**
+     *
+     * @param {string} event
+     * @param {Object} data
+     */
     emit(event, data) {
         this._events.emit(event, data);
     }
@@ -107,10 +129,20 @@ export default class Api {
 
     /**
      *
-     * @returns {SessionAuthorisation}
+     * @returns {SessionAuthorization}
+     * @deprecated
      */
     getSessionAuthorisation() {
-        return this.getInstance('authorisation.session', this);
+        return this.getSessionAuthorization();
+    }
+
+
+    /**
+     *
+     * @returns {SessionAuthorization}
+     */
+    getSessionAuthorization() {
+        return this.getInstance('authorization.session', this);
     }
 
     /**
@@ -215,11 +247,15 @@ export default class Api {
                 request : ApiRequest,
                 response: ApiResponse
             },
-            authorisation: {
-                session: SessionAuthorisation
+            authorization: {
+                session: SessionAuthorization
             },
             challenge    : {
                 pwdv1: PWDv1Challenge
+            },
+            token        : {
+                user   : UserToken,
+                request: RequestToken
             },
             encryption   : {
                 csev1: CSEv1Encryption,
