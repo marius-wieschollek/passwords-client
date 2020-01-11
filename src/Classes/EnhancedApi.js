@@ -1157,7 +1157,7 @@ export default class EnhancedApi extends SimpleApi {
             customFields: {
                 type   : 'string',
                 length : 10240,
-                default: '{}'
+                default: '[]'
             },
             folder      : {
                 type   : 'string',
