@@ -1,0 +1,12 @@
+{
+    "baseUrl":{
+        "type": "string",
+        "match": "https:\/\/.+"
+    },
+    "user":{
+        "type": "string"
+    },
+    "token":{
+        "type": "string"
+    }
+}

@@ -1,6 +1,4 @@
-import SimpleApi from './Classes/SimpleApi';
-import Encryption from './Classes/Encryption';
-import EnhancedApi from './Classes/EnhancedApi';
+import Api from './Api/Api';
 
-export default EnhancedApi;
-export {EnhancedApi, SimpleApi, Encryption};
+export default Api;
+export {Api};
