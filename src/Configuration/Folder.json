@@ -1,0 +1,51 @@
+{
+    "id": {
+        "type": "string",
+        "match": ""
+    },
+    "revision": {
+        "type": "string",
+        "match": ""
+    },
+    "label": {
+        "type": "string",
+        "match": ".+{1,64}"
+    },
+    "parent": {
+        "type": "string",
+        "match": ""
+    },
+    "hidden": {
+        "type": "boolean"
+    },
+    "trashed": {
+        "type": "boolean"
+    },
+    "favorite": {
+        "type": "boolean"
+    },
+    "cseType": {
+        "type": "string",
+        "match": "none|CSEv1r1"
+    },
+    "cseKey": {
+        "type": "string",
+        "match": ""
+    },
+    "sseType": {
+        "type": "string",
+        "match": "none|SSEv1r1|SSEv1r2|SSEv2r1"
+    },
+    "client": {
+        "type": "string"
+    },
+    "edited": {
+        "type": "date"
+    },
+    "created": {
+        "type": "date"
+    },
+    "updated": {
+        "type": "date"
+    }
+}

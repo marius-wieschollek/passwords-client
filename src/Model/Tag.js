@@ -1,5 +1,5 @@
 import AbstractModel from './AbstractModel';
-import Properties from '../Configuration/Password';
+import Properties from '../Configuration/Tag';
 
 export default class Tag extends AbstractModel {
 
