@@ -2,15 +2,35 @@ import ApiResponse from './ApiResponse';
 
 export default class ApiRequest {
 
+    /**
+     *
+     * @param {Api} api
+     * @param {string} [url=null]
+     * @param {Session} [session=null]
+     */
     constructor(api, url = null, session = null) {
         this._api = api;
         this._url = url;
         this._path = null;
         this._data = null;
+        this._userAgent = null;
         this._session = session;
         this._responseType = 'application/json';
     }
 
+    /**
+     *
+     * @returns {(string|null)}
+     */
+    getUrl() {
+        return this._url;
+    }
+
+    /**
+     *
+     * @param {Session} value
+     * @returns {ApiRequest}
+     */
     setUrl(value) {
         this._url = value;
 
@@ -35,14 +55,35 @@ export default class ApiRequest {
         return this;
     }
 
+    /**
+     *
+     * @param {string} value
+     * @return {ApiRequest}
+     */
     setPath(value) {
         this._path = value;
 
         return this;
     }
 
+    /**
+     *
+     * @param {Object} value
+     * @return {ApiRequest}
+     */
     setData(value) {
         this._data = value;
+
+        return this;
+    }
+
+    /**
+     *
+     * @param {string} value
+     * @return {ApiRequest}
+     */
+    setUserAgent(value) {
+        this._userAgent = value;
 
         return this;
     }
@@ -80,6 +121,11 @@ export default class ApiRequest {
         return response;
     }
 
+    /**
+     *
+     * @return {{redirect: string, headers: Headers, method: string, credentials: string}}
+     * @private
+     */
     _getRequestOptions() {
         let headers = this._getRequestHeaders();
         let method = 'GET';
@@ -93,6 +139,11 @@ export default class ApiRequest {
         return options;
     }
 
+    /**
+     *
+     * @return {Headers}
+     * @private
+     */
     _getRequestHeaders() {
         let headers = new Headers();
 
@@ -108,6 +159,10 @@ export default class ApiRequest {
             headers.append('content-type', 'application/json');
         }
 
+        if(this._userAgent !== null) {
+            headers.append('user-agent', this._userAgent);
+        }
+
         if(this._session.getId() !== null) {
             headers.append('x-api-session', this._session.getId());
         }
@@ -117,8 +172,8 @@ export default class ApiRequest {
 
     /**
      *
-     * @param url
-     * @param options
+     * @param {string} url
+     * @param {Object} options
      * @returns {Promise<Response>}
      * @private
      */

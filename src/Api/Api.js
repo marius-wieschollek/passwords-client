@@ -113,10 +113,16 @@ export default class Api {
 
     /**
      *
-     * @returns {ApiRequest}
+     * @return {ApiRequest}
      */
     getRequest() {
-        return this.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
+        /** @type {ApiRequest} **/
+        let request = this.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
+        if(this._config.userAgent !== null) {
+            request.setUserAgent(this._config.userAgent)
+        }
+
+        return request;
     }
 
     /**
