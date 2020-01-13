@@ -107,6 +107,8 @@ export default class FolderRepository {
     async _dataToModel(data) {
         if(data.cseType === 'CSEv1r1') {
             data = await this._api.getCseV1Encryption().decrypt(data, 'folder');
+        } else if(data.cseType !== 'none') {
+            throw new this._api.getClass('exception.encryption', data.id, data.cseType);
         }
 
         let folder = this._api.getClass('model.folder', this._api, data);

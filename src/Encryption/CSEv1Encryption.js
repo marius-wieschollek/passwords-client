@@ -29,6 +29,7 @@ export default class CSEv1Encryption {
      * @returns {Object}
      */
     async encrypt(object, type) {
+        // TODO custom errors here
         if(!this.fields.hasOwnProperty(type)) throw new Error('Invalid object type');
         await this.ready();
 
@@ -57,6 +58,7 @@ export default class CSEv1Encryption {
      * @returns {Object}
      */
     async decrypt(object, type) {
+        // TODO custom errors here
         if(!this.fields.hasOwnProperty(type)) throw new Error('Invalid object type');
         if(object.cseType !== 'CSEv1r1') throw new Error('Unsupported encryption type');
         await this.ready();

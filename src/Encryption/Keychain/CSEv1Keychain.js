@@ -47,6 +47,7 @@ export default class CSEv1Keychain {
             return this._keys[id];
         }
 
+        // TODO custom error here
         throw new Error('Unknown CSE key id');
     }
 

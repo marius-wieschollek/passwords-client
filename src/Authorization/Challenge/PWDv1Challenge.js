@@ -72,15 +72,15 @@ export default class PWDv1Challenge {
         if(this._password.length < 12) throw new Error('Password is too short');
         if(this._password.length > 128) throw new Error('Password is too long');
 
-        let passwordSalt   = this._generateRandom(256),
-            genericHashKey = this._generateRandom(sodium.crypto_generichash_KEYBYTES_MAX),
+        let passwordSalt   = sodium.randombytes_buf(256),
+            genericHashKey = sodium.randombytes_buf(sodium.crypto_generichash_KEYBYTES_MAX),
             genericHash    = sodium.crypto_generichash(
                 sodium.crypto_generichash_BYTES_MAX,
                 new Uint8Array([...sodium.from_string(this._password), ...passwordSalt]),
                 genericHashKey
             );
 
-        let passwordHashSalt = this._generateRandom(sodium.crypto_pwhash_SALTBYTES),
+        let passwordHashSalt = sodium.sodium(sodium.crypto_pwhash_SALTBYTES),
             passwordHash     = sodium.crypto_pwhash(
                 sodium.crypto_box_SEEDBYTES,
                 genericHash,
@@ -98,20 +98,5 @@ export default class PWDv1Challenge {
             ],
             secret: sodium.to_hex(passwordHash)
         }
-    }
-
-    // noinspection JSMethodCanBeStatic
-    /**
-     *
-     * @param length
-     * @returns {Uint8Array}
-     * @private
-     * @deprecated
-     */
-    _generateRandom(length) {
-        let array = new Uint8Array(length);
-        window.crypto.getRandomValues(array);
-
-        return array;
     }
 }

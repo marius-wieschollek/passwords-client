@@ -29,7 +29,7 @@ export default class SessionAuthorization {
 
         let requirements = response.getData();
         if(requirements.hasOwnProperty('challenge')) {
-            this._challenge = this._api.getClass('challenge.pwdv1', requirements.challenge);
+            this._createChallenge(requirements.challenge);
         }
         if(requirements.hasOwnProperty('token')) {
             this._createTokens(requirements.token);
@@ -150,10 +150,25 @@ export default class SessionAuthorization {
 
     /**
      *
+     * @param {Object} challenge
+     * @private
+     */
+    _createChallenge(challenge) {
+        if(challenge.type === 'PWDv1r1') {
+            this._challenge = this._api.getClass('challenge.pwdv1', challenge);
+        } else {
+            throw new this._api.getClass('exception.challenge');
+        }
+    }
+
+    /**
+     *
      * @param {Object[]} tokens
      * @private
      */
     _createTokens(tokens) {
+        this._tokens = [];
+
         for(let token of tokens) {
             if(token.type === 'user-token') {
                 let model = this._api.getClass('token.user', this._api, token.id, token.label, token.description, token.request);
@@ -163,6 +178,10 @@ export default class SessionAuthorization {
                 let model = this._api.getClass('token.request', this._api, token.id, token.label, token.description, token.request);
                 this._tokens.push(model);
             }
+        }
+
+        if(this._tokens.length === 0 && tokens.length !== 0) {
+            throw new this._api.getClass('exception.token');
         }
     }
 }

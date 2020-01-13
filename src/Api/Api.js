@@ -35,6 +35,8 @@ import HttpError from '../Exception/Http/HttpError';
 import EventEmitter from 'eventemitter3';
 import UserToken from '../Authorization/Token/UserToken';
 import RequestToken from '../Authorization/Token/RequestToken';
+import TokenTypeNotSupported from '../Exception/TokenTypeNotSupported';
+import EncryptionTypeNotSupported from '../Exception/EncryptionTypeNotSupported';
 
 export default class Api {
 
@@ -278,6 +280,9 @@ export default class Api {
                 contenttype  : ResponseContentTypeError,
                 decoding     : ResponseDecodingError,
                 property     : UnknownPropertyError,
+                challenge    : TokenTypeNotSupported,
+                token        : TokenTypeNotSupported,
+                encryption   : EncryptionTypeNotSupported,
                 network      : NetworkError,
                 http         : HttpError,
                 400          : BadRequestError,
