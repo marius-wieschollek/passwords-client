@@ -50,6 +50,10 @@ export default class Api {
         this._classes = ObjectMerger.merge(this._getDefaultClasses(), classes);
         this._instances = {};
 
+        if(!config.hasOwnProperty('userAgent')) {
+            config.userAgent = null;
+        }
+
         if(config.hasOwnProperty('defaultEncryption') && ['auto', 'none', 'CSEv1r1'].indexOf(config.defaultEncryption) === -1) {
             throw new ConfigurationError('Invalid default encryption');
         }
