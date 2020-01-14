@@ -169,6 +169,8 @@ export default class EnhancedApi extends SimpleApi {
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'password');
+        } else {
+            object.cseKey = '';
         }
 
         return await super.createPassword(object);
@@ -198,6 +200,9 @@ export default class EnhancedApi extends SimpleApi {
 
         if(this.config.encryption.enabled && object.cseType !== 'none' && (!data.hasOwnProperty('shared') || !data.shared)) {
             this.config.encryption.encryptObject(object, 'password');
+        } else {
+            object.cseType = 'none';
+            object.cseKey = '';
         }
 
         return await super.updatePassword(object);
@@ -264,6 +269,8 @@ export default class EnhancedApi extends SimpleApi {
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'folder');
+        } else {
+            object.cseKey = '';
         }
 
         return super.createFolder(object);
@@ -289,6 +296,8 @@ export default class EnhancedApi extends SimpleApi {
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'folder');
+        } else {
+            object.cseKey = '';
         }
 
         return super.updateFolder(object);
@@ -355,6 +364,8 @@ export default class EnhancedApi extends SimpleApi {
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'tag');
+        } else {
+            object.cseKey = '';
         }
 
         return super.createTag(object);
@@ -380,6 +391,8 @@ export default class EnhancedApi extends SimpleApi {
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
             this.config.encryption.encryptObject(object, 'tag');
+        } else {
+            object.cseKey = '';
         }
 
         return super.updateTag(object);
