@@ -59,11 +59,11 @@ export default class TagRepository {
         }
 
         let request = this._api.getRequest()
-            .setPath('api/1.0/tag/show')
+            .setPath('1.0/tag/show')
             .setData({id});
 
         let response = await request.send(),
-            tag = await this._dataToModel(response.getData());
+            tag      = await this._dataToModel(response.getData());
 
         this._cache.set(tag.getId(), tag, 'tag');
 
@@ -80,7 +80,7 @@ export default class TagRepository {
         }
 
         let request = this._api.getRequest()
-            .setPath('api/1.0/tag/list');
+            .setPath('1.0/tag/list');
 
         let response = await request.send();
         let tags = response.getData();
@@ -111,9 +111,9 @@ export default class TagRepository {
             throw new this._api.getClass('exception.encryption', data.id, data.cseType);
         }
 
-        let tag = this._api.getClass('model.tag', this._api, data);
+        let tag = this._api.getClass('model.tag', data, this._api);
         this._cache.set(tag.getId(), tag, 'tag');
 
-        return tag
+        return tag;
     }
 }

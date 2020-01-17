@@ -59,7 +59,7 @@ export default class FolderRepository {
         }
 
         let request = this._api.getRequest()
-            .setPath('api/1.0/folder/show')
+            .setPath('1.0/folder/show')
             .setData({id});
 
         let response = await request.send(),
@@ -80,7 +80,7 @@ export default class FolderRepository {
         }
 
         let request = this._api.getRequest()
-            .setPath('api/1.0/folder/list');
+            .setPath('1.0/folder/list');
 
         let response = await request.send();
         let folders = response.getData();
@@ -111,7 +111,7 @@ export default class FolderRepository {
             throw new this._api.getClass('exception.encryption', data.id, data.cseType);
         }
 
-        let folder = this._api.getClass('model.folder', this._api, data);
+        let folder = this._api.getClass('model.folder', data, this._api);
         this._cache.set(folder.getId(), folder, 'folder');
 
         return folder

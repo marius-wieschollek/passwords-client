@@ -59,7 +59,7 @@ export default class PasswordRepository {
         }
 
         let request = this._api.getRequest()
-            .setPath('api/1.0/password/show')
+            .setPath('1.0/password/show')
             .setData({id});
 
         let response = await request.send(),
@@ -80,7 +80,7 @@ export default class PasswordRepository {
         }
 
         let request = this._api.getRequest()
-            .setPath('api/1.0/password/list');
+            .setPath('1.0/password/list');
 
         let response = await request.send();
         let passwords = response.getData();
@@ -111,7 +111,7 @@ export default class PasswordRepository {
             throw new this._api.getClass('exception.encryption', data.id, data.cseType);
         }
 
-        let password = this._api.getClass('model.password', this._api, data);
+        let password = this._api.getClass('model.password', data, this._api);
         this._cache.set(password.getId(), password, 'password');
 
         return password
