@@ -5,11 +5,11 @@ import CSEv1Encryption from '../Encryption/CSEv1Encryption';
 import FolderRepository from '../Repositories/FolderRepository';
 import TagRepository from '../Repositories/TagRepository';
 import ApiRequest from '../Network/ApiRequest';
-import Password from '../Model/Password';
-import Folder from '../Model/Folder';
-import Server from '../Model/Server';
-import Tag from '../Model/Tag';
-import Session from '../Model/Session';
+import Password from '../Model/Password/Password';
+import Folder from '../Model/Folder/Folder';
+import Server from '../Model/Server/Server';
+import Tag from '../Model/Tag/Tag';
+import Session from '../Model/Session/Session';
 import ApiResponse from '../Network/ApiResponse';
 import ExportV1Encryption from '../Encryption/ExportV1Encryption';
 import CSEv1Keychain from '../Encryption/Keychain/CSEv1Keychain';
@@ -73,7 +73,7 @@ export default class Api {
 
     /**
      *
-     * @param {string} event
+     * @param {String} event
      * @param {Function} listener
      */
     on(event, listener) {
@@ -82,7 +82,7 @@ export default class Api {
 
     /**
      *
-     * @param {string} event
+     * @param {String} event
      * @param {Function} listener
      */
     once(event, listener) {
@@ -91,7 +91,7 @@ export default class Api {
 
     /**
      *
-     * @param {string} event
+     * @param {String} event
      * @param {Function} listener
      */
     off(event, listener) {
@@ -100,7 +100,7 @@ export default class Api {
 
     /**
      *
-     * @param {string} event
+     * @param {String} event
      * @param {Object} data
      */
     emit(event, data) {
@@ -123,7 +123,7 @@ export default class Api {
         /** @type {ApiRequest} **/
         let request = this.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
         if(this._config.userAgent !== null) {
-            request.setUserAgent(this._config.userAgent)
+            request.setUserAgent(this._config.userAgent);
         }
 
         return request;
@@ -138,7 +138,6 @@ export default class Api {
             .setToken(this._server.getToken());
     }
 
-
     /**
      *
      * @returns {SessionAuthorization}
@@ -147,7 +146,6 @@ export default class Api {
     getSessionAuthorisation() {
         return this.getSessionAuthorization();
     }
-
 
     /**
      *
@@ -194,7 +192,7 @@ export default class Api {
 
     /**
      *
-     * @param {string} name
+     * @param {String} name
      * @param {*} properties
      * @return {Object}
      */
@@ -217,7 +215,7 @@ export default class Api {
 
     /**
      *
-     * @param {string} name
+     * @param {String} name
      * @param {*} properties
      * @return {Object}
      */

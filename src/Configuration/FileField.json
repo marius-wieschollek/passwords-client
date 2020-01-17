@@ -1,0 +1,14 @@
+{
+    "label": {
+        "type": "string",
+        "match": ".+{1,48}"
+    },
+    "type": {
+        "type": "string",
+        "match": "file"
+    },
+    "value": {
+        "type": "string",
+        "match": ".+{1,320}"
+    }
+}
