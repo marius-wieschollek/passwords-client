@@ -37,6 +37,9 @@ import UserToken from '../Authorization/Token/UserToken';
 import RequestToken from '../Authorization/Token/RequestToken';
 import TokenTypeNotSupported from '../Exception/TokenTypeNotSupported';
 import EncryptionTypeNotSupported from '../Exception/EncryptionTypeNotSupported';
+import PasswordCollection from '../Collection/PasswordCollection';
+import FolderCollection from '../Collection/FolderCollection';
+import TagCollection from '../Collection/TagCollection';
 
 export default class Api {
 
@@ -220,9 +223,13 @@ export default class Api {
      * @return {Object}
      */
     getClass(name, ...properties) {
-        let path    = name.split('.'),
-            creator = this._classes[path[0]][path[1]];
+        let path = name.split('.');
 
+        if(!this._classes.hasOwnProperty(path[0]) || !this._classes[path[0]].hasOwnProperty(path[1])) {
+            throw new Error(`The class ${name} does not exist`);
+        }
+
+        let creator = this._classes[path[0]][path[1]];
         if(creator.hasOwnProperty('name') && creator.name === creator.prototype.constructor.name) {
             if(creator.hasOwnProperty('arguments') && creator.hasOwnProperty('caller')) {
                 return creator(...properties);
@@ -245,6 +252,11 @@ export default class Api {
                 password: PasswordRepository,
                 folder  : FolderRepository,
                 tag     : TagRepository
+            },
+            collection   : {
+                password: PasswordCollection,
+                folder  : FolderCollection,
+                tag     : TagCollection
             },
             model        : {
                 password: Password,

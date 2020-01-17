@@ -24,7 +24,7 @@ export default class SessionAuthorization {
         if(this._loaded) return;
         this._loaded = true;
         let response = await this._api.getRequest()
-            .setPath('api/1.0/session/request')
+            .setPath('1.0/session/request')
             .send();
 
         let requirements = response.getData();
@@ -135,7 +135,7 @@ export default class SessionAuthorization {
         }
 
         let request = await this._api.getRequest()
-            .setPath('api/1.0/session/open')
+            .setPath('1.0/session/open')
             .setData(data);
 
         let response = await request.send();

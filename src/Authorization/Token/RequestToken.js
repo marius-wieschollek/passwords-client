@@ -16,7 +16,7 @@ export default class RequestToken extends AbstractToken {
         try {
             this._token = await this._api
                 .getRequest()
-                .setPath(`api/1.0/token/${this._id}/request`)
+                .setPath(`1.0/token/${this._id}/request`)
                 .send();
             return true;
         } catch(e) {

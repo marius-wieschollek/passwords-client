@@ -75,7 +75,7 @@ export default class AbstractToken {
         try {
             await this._api
                 .getRequest()
-                .setPath(`api/1.0/token/${this._id}/request`)
+                .setPath(`1.0/token/${this._id}/request`)
                 .send();
             return true;
         } catch(e) {
