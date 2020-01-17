@@ -5,7 +5,7 @@ export default class ApiRequest {
     /**
      *
      * @param {Api} api
-     * @param {string} [url=null]
+     * @param {String} [url=null]
      * @param {Session} [session=null]
      */
     constructor(api, url = null, session = null) {
@@ -20,7 +20,7 @@ export default class ApiRequest {
 
     /**
      *
-     * @returns {(string|null)}
+     * @returns {(String|null)}
      */
     getUrl() {
         return this._url;
@@ -57,7 +57,7 @@ export default class ApiRequest {
 
     /**
      *
-     * @param {string} value
+     * @param {String} value
      * @return {ApiRequest}
      */
     setPath(value) {
@@ -79,7 +79,7 @@ export default class ApiRequest {
 
     /**
      *
-     * @param {string} value
+     * @param {String} value
      * @return {ApiRequest}
      */
     setUserAgent(value) {
@@ -172,7 +172,7 @@ export default class ApiRequest {
 
     /**
      *
-     * @param {string} url
+     * @param {String} url
      * @param {Object} options
      * @returns {Promise<Response>}
      * @private

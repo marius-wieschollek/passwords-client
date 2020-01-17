@@ -3,10 +3,10 @@ export default class AbstractToken {
     /**
      *
      * @param {Api} api
-     * @param {string} id
-     * @param {string} label
-     * @param {string} description
-     * @param {boolean} request
+     * @param {String} id
+     * @param {String} label
+     * @param {String} description
+     * @param {Boolean} request
      */
     constructor(api, id, label, description, request) {
         this._id = id;
@@ -19,7 +19,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     getType() {
         return 'abstract-token';
@@ -27,7 +27,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     getId() {
         return this._id;
@@ -35,7 +35,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     getLabel() {
         return this._label;
@@ -43,7 +43,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     getDescription() {
         return this._description;
@@ -51,7 +51,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     requiresRequest() {
         return this._request;
@@ -59,7 +59,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @return {(string|null)}
+     * @return {(String|null)}
      */
     getToken() {
         return this._token;

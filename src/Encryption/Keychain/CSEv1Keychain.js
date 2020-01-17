@@ -40,7 +40,7 @@ export default class CSEv1Keychain {
      * Get a key by id
      *
      * @param id
-     * @returns {string}
+     * @returns {String}
      */
     getKey(id) {
         if(this._keys.hasOwnProperty(id)) {
@@ -54,7 +54,7 @@ export default class CSEv1Keychain {
     /**
      * Get the current key
      *
-     * @returns {string}
+     * @returns {String}
      */
     getCurrentKey() {
         return this.getKey(this._current);
@@ -63,7 +63,7 @@ export default class CSEv1Keychain {
     /**
      * Get the current key
      *
-     * @returns {string|null}
+     * @returns {(String|null)}
      */
     getCurrentKeyId() {
         return this._current;
@@ -72,7 +72,7 @@ export default class CSEv1Keychain {
     /**
      * Decrypt the given keychain and apply it
      *
-     * @param {string} keychainText
+     * @param {String} keychainText
      */
     import(keychainText) {
         let encrypted;
@@ -101,7 +101,7 @@ export default class CSEv1Keychain {
     /**
      * Export the keychain as encrypted string
      *
-     * @returns {string}
+     * @returns {String}
      */
     export() {
         let keychain = {

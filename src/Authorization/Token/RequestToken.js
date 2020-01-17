@@ -4,7 +4,7 @@ export default class RequestToken extends AbstractToken {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     getType() {
         return 'request-token';

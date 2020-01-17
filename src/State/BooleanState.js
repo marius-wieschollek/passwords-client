@@ -136,7 +136,7 @@ export default class BooleanState {
 
     /**
      *
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     toJSON() {
         return this._value;
@@ -164,7 +164,7 @@ export default class BooleanState {
 
     /**
      *
-     * @param {string} event
+     * @param {String} event
      * @private
      */
     _notifyEvents(event) {
@@ -175,7 +175,7 @@ export default class BooleanState {
 
     /**
      *
-     * @param {string} event
+     * @param {String} event
      * @param {Function} callback
      * @private
      */

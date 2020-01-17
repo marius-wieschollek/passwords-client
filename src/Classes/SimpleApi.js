@@ -746,7 +746,7 @@ export default class SimpleApi {
     /**
      *
      * @param path
-     * @returns {string}
+     * @returns {String}
      * @private
      */
     _getRequestUrl(path) {

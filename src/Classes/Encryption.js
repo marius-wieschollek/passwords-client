@@ -17,7 +17,7 @@ export default class Encryption {
 
     /**
      *
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     get enabled() {
         return this._enabled;
@@ -25,7 +25,7 @@ export default class Encryption {
 
     /**
      *
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     get keys() {
         return Object.keys(this._keys);
@@ -43,7 +43,7 @@ export default class Encryption {
     /**
      * Returns true if the user has base64 encoded properties
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     hasLegacyEncoding() {
         return this._legacyEncoding;
@@ -144,7 +144,7 @@ export default class Encryption {
      *
      * @param message
      * @param key
-     * @returns {string}
+     * @returns {String}
      */
     encryptString(message, key) {
         return sodium.to_hex(this.encrypt(message, key));
@@ -168,7 +168,7 @@ export default class Encryption {
      *
      * @param encodedString
      * @param key
-     * @returns {string}
+     * @returns {String}
      */
     decryptString(encodedString, key) {
         try {
@@ -206,7 +206,7 @@ export default class Encryption {
      *
      * @param salts
      * @param password
-     * @returns {string}
+     * @returns {String}
      */
     solveChallenge(password, salts) {
         if(password.length < 12) throw new Error('Password is too short');
@@ -351,7 +351,7 @@ export default class Encryption {
     /**
      * Create a uuidv4
      *
-     * @returns {string}
+     * @returns {String}
      */
     getUuid() {
         return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>

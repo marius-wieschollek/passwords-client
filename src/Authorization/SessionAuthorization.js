@@ -38,7 +38,7 @@ export default class SessionAuthorization {
 
     /**
      *
-     * @return {boolean}
+     * @return {Boolean}
      * @deprecated
      */
     hasChallenge() {
@@ -47,7 +47,7 @@ export default class SessionAuthorization {
 
     /**
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     requiresChallenge() {
         return this._challenge !== null;
@@ -63,7 +63,7 @@ export default class SessionAuthorization {
 
     /**
      *
-     * @return {boolean}
+     * @return {Boolean}
      */
     requiresToken() {
         return this._tokens.length !== 0;
@@ -87,7 +87,7 @@ export default class SessionAuthorization {
 
     /**
      *
-     * @param {(AbstractToken|string|null)} tokenId
+     * @param {(AbstractToken|String|null)} tokenId
      * @return {SessionAuthorization}
      */
     setActiveToken(tokenId) {
@@ -110,8 +110,8 @@ export default class SessionAuthorization {
 
     /**
      *
-     * @param {string} [password]
-     * @param {string|AbstractToken} [token]
+     * @param {String} [password]
+     * @param {(String|AbstractToken)} [token]
      * @return {Promise<void>}
      */
     async authorize(password, token) {

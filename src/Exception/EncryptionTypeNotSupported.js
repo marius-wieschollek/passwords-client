@@ -2,7 +2,7 @@ export default class EncryptionTypeNotSupported extends Error {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     get objectId() {
         return this._objectId;
@@ -10,7 +10,7 @@ export default class EncryptionTypeNotSupported extends Error {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     get cseType() {
         return this._cseType;
@@ -18,8 +18,8 @@ export default class EncryptionTypeNotSupported extends Error {
 
     /**
      *
-     * @param {string} objectId
-     * @param {string} cseType
+     * @param {String} objectId
+     * @param {String} cseType
      */
     constructor(objectId, cseType) {
         super(`The encryption type ${cseType} used for ${objectId} is not supported by this client`);

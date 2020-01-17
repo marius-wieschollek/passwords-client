@@ -4,7 +4,7 @@ export default class UserToken extends AbstractToken {
 
     /**
      *
-     * @return {string}
+     * @return {String}
      */
     getType() {
         return 'user-token';
@@ -12,7 +12,7 @@ export default class UserToken extends AbstractToken {
 
     /**
      *
-     * @param {string} value
+     * @param {String} value
      * @return {UserToken}
      */
     setToken(value) {

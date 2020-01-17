@@ -25,7 +25,7 @@ export default class CSEv1Encryption {
      * Encrypts an object
      *
      * @param {Object} object
-     * @param {string} type
+     * @param {String} type
      * @returns {Object}
      */
     async encrypt(object, type) {
@@ -54,7 +54,7 @@ export default class CSEv1Encryption {
      * Decrypts an object
      *
      * @param {Object} object
-     * @param {string} type
+     * @param {String} type
      * @returns {Object}
      */
     async decrypt(object, type) {
@@ -80,9 +80,9 @@ export default class CSEv1Encryption {
     /**
      * Encrypt the message with the given key and return a hex encoded string
      *
-     * @param {string} message
+     * @param {String} message
      * @param {Uint8Array} key
-     * @returns {string}
+     * @returns {String}
      * @private
      */
     _encryptString(message, key) {
@@ -92,9 +92,9 @@ export default class CSEv1Encryption {
     /**
      * Decrypt the hex or base64 encoded message with the given key
      *
-     * @param {string} encodedString
+     * @param {String} encodedString
      * @param {Uint8Array} key
-     * @returns {string}
+     * @returns {String}
      * @private
      */
     _decryptString(encodedString, key) {
