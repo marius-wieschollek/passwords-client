@@ -10,15 +10,26 @@ export default class CSEv1Encryption {
             tag     : ['label', 'color']
         };
         this._enabled = new BooleanState(false);
+        this._ready = new BooleanState(false);
         this._keychain = null;
+
+        sodium.ready.then(() => {this._ready.set(true);});
     }
 
     /**
      *
-     * @returns {Promise<boolean>}
+     * @returns {Promise<Boolean>}
      */
     async ready() {
-        await sodium.ready && await this._enabled.awaitTrue();
+        await this._ready.awaitTrue() && await this._enabled.awaitTrue();
+    }
+
+    /**
+     *
+     * @returns {Boolean}
+     */
+    enabled() {
+        this._ready.get() && this._enabled.get();
     }
 
     /**
