@@ -5,4 +5,8 @@ import SimpleServer from './Server/Server';
  */
 export default class Server extends SimpleServer {
 
+    constructor(data = {}, properties = null) {
+        console.trace('Deprecated server class used');
+        super(data, properties);
+    }
 }
