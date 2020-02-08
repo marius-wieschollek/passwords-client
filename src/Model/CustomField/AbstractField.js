@@ -3,7 +3,48 @@ import AbstractModel from '../AbstractModel';
 export default class AbstractField extends AbstractModel {
 
     /**
-     *
+     * @param {String} value
+     */
+    set type(value) {
+        throw new Error('Type is not writeable')
+    }
+
+    /**
+     * @return {String}
+     */
+    get type() {
+        return this.getProperty('type');
+    }
+
+    /**
+     * @param {String} value
+     */
+    set label(value) {
+        this.setProperty('label', value);
+    }
+
+    /**
+     * @return {String}
+     */
+    get label() {
+        return this.getProperty('label');
+    }
+
+    /**
+     * @param {String} value
+     */
+    set value(value) {
+        this.setProperty('value', value);
+    }
+
+    /**
+     * @return {String}
+     */
+    get value() {
+        return this.getProperty('value');
+    }
+
+    /**
      * @param {String} value
      * @return {AbstractField}
      */
@@ -12,7 +53,6 @@ export default class AbstractField extends AbstractModel {
     }
 
     /**
-     *
      * @return {String}
      */
     getType() {
@@ -20,18 +60,16 @@ export default class AbstractField extends AbstractModel {
     }
 
     /**
-     *
      * @param {String} value
      * @return {AbstractField}
      */
     setLabel(value) {
-        this.setProperty('label');
+        this.label = value;
 
         return this;
     }
 
     /**
-     *
      * @return {String}
      */
     getLabel() {
@@ -39,18 +77,16 @@ export default class AbstractField extends AbstractModel {
     }
 
     /**
-     *
      * @param {String} value
      * @return {AbstractField}
      */
     setValue(value) {
-        this.setProperty('value');
+        this.value = value;
 
         return this;
     }
 
     /**
-     *
      * @return {String}
      */
     getValue() {
