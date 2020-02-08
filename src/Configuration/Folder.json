@@ -1,51 +1,65 @@
 {
     "id": {
         "type": "string",
-        "match": ""
+        "match": "",
+        "writeable": false
     },
     "revision": {
         "type": "string",
-        "match": ""
+        "match": "",
+        "writeable": false
     },
     "label": {
         "type": "string",
-        "match": ".+{1,64}"
+        "match": ".+{1,64}",
+        "writeable": true
     },
     "parent": {
         "type": "string",
-        "match": ""
+        "match": "",
+        "writeable": true
     },
     "hidden": {
-        "type": "boolean"
+        "type": "boolean",
+        "writeable": true
     },
     "trashed": {
-        "type": "boolean"
+        "type": "boolean",
+        "writeable": false
     },
     "favorite": {
-        "type": "boolean"
+        "type": "boolean",
+        "writeable": true
     },
     "cseType": {
         "type": "string",
-        "match": "none|CSEv1r1"
+        "match": "none|CSEv1r1",
+        "writeable": true
     },
     "cseKey": {
         "type": "string",
-        "match": ""
+        "match": "",
+        "writeable": true
     },
     "sseType": {
         "type": "string",
-        "match": "none|SSEv1r1|SSEv1r2|SSEv2r1"
+        "match": "none|SSEv1r1|SSEv1r2|SSEv2r1",
+        "writeable": false
     },
     "client": {
-        "type": "string"
+        "type": "string",
+        "writeable": false
     },
     "edited": {
-        "type": "date"
+        "type": "date",
+        "writeable": true
     },
     "created": {
-        "type": "date"
+        "type": "date",
+        "writeable": false
     },
     "updated": {
-        "type": "date"
+        "type": "date",
+        "writeable": false
     }
 }
