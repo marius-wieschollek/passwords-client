@@ -42,10 +42,30 @@ export default class EnhancedPassword extends Password {
 
     /**
      *
+     * @param {(String|Number)} width
+     * @param {(String|Number)} height
+     * @param {String} view
+     * @return {String}
+     */
+    getPreviewUrl(width = 640, height = '360...', view = 'desktop') {
+        let host = 'default';
+
+        if(this.getUrl()) {
+            let url = Url(this.getUrl());
+
+            if(url.host.length !== 0) {
+                host = url.host;
+            }
+        }
+
+        return `${this.getServer().getApiUrl()}1.0/service/preview/${host}/${view}/${width}/${height}`;
+    }
+
+    /**
+     *
      * @returns {Promise<Password[]>}
      */
     async fetchRevisions() {
-
     }
 
     /**
@@ -53,7 +73,6 @@ export default class EnhancedPassword extends Password {
      * @returns {Promise<Share[]>}
      */
     async fetchShare() {
-
     }
 
     /**
@@ -61,7 +80,6 @@ export default class EnhancedPassword extends Password {
      * @returns {Promise<Share[]>}
      */
     async fetchShares() {
-
     }
 
     /**
@@ -76,6 +94,5 @@ export default class EnhancedPassword extends Password {
      * @returns {Promise<Folder[]>}
      */
     async fetchFolder() {
-
     }
 }
