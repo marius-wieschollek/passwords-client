@@ -1,7 +1,7 @@
-import AbstractModel from '../AbstractModel';
 import Properties from '../../Configuration/Folder';
+import AbstractRevisionModel from '../AbstractRevisionModel';
 
-export default class Folder extends AbstractModel {
+export default class Folder extends AbstractRevisionModel {
 
     /**
      *
@@ -9,22 +9,6 @@ export default class Folder extends AbstractModel {
      */
     constructor(data = {}) {
         super(Properties, data);
-    }
-
-    /**
-     * @return {String}
-     */
-    getId() {
-        return this.getProperty('id');
-    }
-
-    /**
-     * @param {String} value
-     *
-     * @return {Folder}
-     */
-    setId(value) {
-        return this.setProperty('id', value);
     }
 
     /**
@@ -41,5 +25,21 @@ export default class Folder extends AbstractModel {
      */
     setLabel(value) {
         return this.setProperty('label', value);
+    }
+
+    /**
+     * @return {String}
+     */
+    getParent() {
+        return this.getProperty('parent');
+    }
+
+    /**
+     * @param {String} value
+     *
+     * @return {Folder}
+     */
+    setParent(value) {
+        return this.setProperty('parent', value);
     }
 }

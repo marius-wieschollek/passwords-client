@@ -1,7 +1,7 @@
-import AbstractModel from '../AbstractModel';
 import Properties from '../../Configuration/Tag';
+import AbstractRevisionModel from '../AbstractRevisionModel';
 
-export default class Tag extends AbstractModel {
+export default class Tag extends AbstractRevisionModel {
 
     /**
      *
@@ -9,22 +9,6 @@ export default class Tag extends AbstractModel {
      */
     constructor(data = {}) {
         super(Properties, data);
-    }
-
-    /**
-     * @return {String}
-     */
-    getId() {
-        return this.getProperty('id');
-    }
-
-    /**
-     * @param {String} value
-     *
-     * @return {Tag}
-     */
-    setId(value) {
-        return this.setProperty('id', value);
     }
 
     /**
