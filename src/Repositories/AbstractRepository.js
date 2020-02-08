@@ -3,11 +3,14 @@ export default class AbstractRepository {
     /**
      *
      * @param {Api} api
-     * @param {Cache} cache
+     * @param {String} type
      */
-    constructor(api, cache, type) {
+    constructor(api, type) {
         this._api = api;
-        this._cache = cache;
+        /** @type Cache **/
+        this._cache = api.getInstance('cache.cache');
+        /** @type AbstractConverter **/
+        this._converter = api.getInstance(`converter.${type}`);
         this._type = type;
     }
 
@@ -23,55 +26,146 @@ export default class AbstractRepository {
 
     /**
      *
-     * @param {Tag} model
-     * @returns {Promise<AbstractModel>}
+     * @param {AbstractRevisionModel} model
+     * @returns {Promise<AbstractRevisionModel>}
      */
     async create(model) {
-    }
-
-    /**
-     *
-     * @param {AbstractModel} model
-     * @returns {Promise<AbstractModel>}
-     */
-    async update(model) {
-
-    }
-
-    /**
-     *
-     * @param {AbstractModel} model
-     * @returns {Promise<AbstractModel>}
-     */
-    async delete(model) {
-
-    }
-
-    /**
-     *
-     * @param id
-     * @returns {Promise<AbstractModel>}
-     */
-    async findById(id) {
-        if(this._cache.has(id)) {
-            return this._cache.get(id);
+        if(typeof model.getId() === 'string') {
+            // @TODO: Custom error here
+            throw new Error('Can not create object with id');
         }
 
-        let request = this._api.getRequest()
-            .setPath(`1.0/${this._type}/show`)
-            .setData({id});
+        let data    = await this._converter.toApiObject(model),
+            request = this._api.getRequest()
+                .setPath(`1.0/${this._type}/create`)
+                .setData(data);
 
-        let response = await request.send(),
-            model    = await this._dataToModel(response.getData());
+        try {
+            let response = await request.send();
+            model.setId(response.getData().id);
+            model.setRevision(response.getData().revision);
+            model.setCreated(new Date());
+            model.setUpdated(new Date());
 
-        this._cache.set(model.getId(), model, `${this._type}.model`);
+            this._cache.set(model.getId(), true);
+            this._cache.set(`${model.getId()}.model`, model);
+        } catch(e) {
+            console.error(e);
+            throw e;
+        }
 
         return model;
     }
 
     /**
+     *
+     * @param {AbstractRevisionModel} model
+     * @returns {Promise<AbstractRevisionModel>}
+     */
+    async update(model) {
+        if(typeof model.getId() !== 'string') {
+            // @TODO: Custom error here
+            throw new Error('Can not update object without id');
+        }
+
+        let data    = this._converter.toApiObject(model),
+            request = this._api.getRequest()
+                .setPath(`1.0/${this._type}/update`)
+                .setData(data);
+
+        try {
+            let response = await request.send();
+            model.setRevision(response.getData().revision);
+            model.setUpdated(new Date());
+
+            this._cache.set(model.getId(), true);
+            this._cache.set(`${model.getId()}.model`, model);
+        } catch(e) {
+            console.error(e);
+            throw e;
+        }
+
+        return model;
+    }
+
+    /**
+     *
+     * @param {AbstractRevisionModel} model
+     * @returns {Promise<AbstractRevisionModel>}
+     */
+    async delete(model) {
+        let request = this._api.getRequest()
+            .setPath(`1.0/${this._type}/delete`)
+            .setData({id: model.getId(), revision: model.getRevision()});
+
+        try {
+            let response = await request.send();
+            model.setRevision(response.getData().revision);
+            model.setUpdated(new Date());
+            this._cache.set(`${model.getId()}.model`, model);
+
+            if(!model.isTrashed()) {
+                model.setTrashed(true);
+                this._cache.set(model.getId(), true);
+            } else {
+                this._cache.remove(model.getId());
+            }
+        } catch(e) {
+            console.error(e);
+            throw e;
+        }
+
+        return model;
+    }
+
+    /**
+     *
+     * @param {AbstractRevisionModel} model
+     * @returns {Promise<AbstractRevisionModel>}
+     */
+    async restore(model) {
+        if(!model.getTrashed()) return model;
+
+        let request = this._api.getRequest()
+            .setPath(`1.0/${this._type}/restore`)
+            .setData({id: model.getId(), revision: model.getRevision()});
+
+        try {
+            let response = await request.send();
+            model.setRevision(response.getData().revision);
+            model.setUpdated(new Date());
+            model.setTrashed(false);
+            this._cache.set(model.getId(), true);
+            this._cache.set(`${model.getId()}.model`, model);
+        } catch(e) {
+            console.error(e);
+            throw e;
+        }
+
+        return model;
+    }
+
+    /**
+     *
+     * @param id
+     * @returns {Promise<AbstractRevisionModel>}
+     */
+    async findById(id) {
+        if(this._cache.has(id)) {
+            return this._cache.get(`${id}.model`);
+        }
+
+        let request  = this._api.getRequest()
+                .setPath(`1.0/${this._type}/show`)
+                .setData({id}),
+            response = await request.send();
+
+        return await this._dataToModel(response.getData());
+    }
+
+    /**
      * @api
-     * @returns {Promise<[AbstractModel]>}
+     * @returns {Promise<AbstractRevisionModel[]>}
      */
     async findAll() {
         if(this._cache.has(`${this._type}.collection`)) {
@@ -84,7 +178,7 @@ export default class AbstractRepository {
             data     = response.getData(),
             models   = await this._dataToModels(data);
 
-        let collection = this._api.getClass(`collection.${this._type}`, this._api, models);
+        let collection = this._api.getClass(`collection.${this._type}`, models);
         this._cache.set(`${this._type}.collection`, true);
 
         return collection;
@@ -93,7 +187,7 @@ export default class AbstractRepository {
     /**
      *
      * @param {Object[]} data
-     * @return {Promise<AbstractModel[]>}
+     * @return {Promise<AbstractRevisionModel[]>}
      * @private
      */
     async _dataToModels(data) {
@@ -121,18 +215,13 @@ export default class AbstractRepository {
     /**
      *
      * @param {Object} data
-     * @returns {Promise<AbstractModel>}
+     * @returns {Promise<AbstractRevisionModel>}
      * @private
      */
     async _dataToModel(data) {
-        if(data.cseType === 'CSEv1r1') {
-            data = await this._api.getCseV1Encryption().decrypt(data, this._type);
-        } else if(data.cseType !== 'none') {
-            throw this._api.getClass('exception.encryption', data.id, data.cseType);
-        }
-
-        let model = this._api.getClass(`model.${this._type}`, data, this._api);
-        this._cache.set(model.getId(), model, `${this._type}.model`);
+        let model = await this._converter.fromEncryptedData(data);
+        this._cache.set(model.getId(), true);
+        this._cache.set(`${model.getId()}.model`, model);
 
         return model;
     }

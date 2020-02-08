@@ -18,6 +18,7 @@ export default class AbstractModel {
      * @param {String} property
      *
      * @return {*}
+     * @api
      */
     getProperty(property) {
         if(!this._properties.hasOwnProperty(property)) {
@@ -36,6 +37,7 @@ export default class AbstractModel {
      * @param {*} value
      *
      * @return {AbstractModel}
+     * @api
      */
     setProperty(property, value) {
         if(!this._properties.hasOwnProperty(property)) {
@@ -50,6 +52,7 @@ export default class AbstractModel {
 
     /**
      * @return {{}}
+     * @api
      */
     getProperties() {
         let data = {};
@@ -67,6 +70,7 @@ export default class AbstractModel {
      * @param {Object} properties
      *
      * @return {AbstractModel}
+     * @api
      */
     setProperties(properties) {
         for(let key in properties) {
@@ -79,8 +83,16 @@ export default class AbstractModel {
     }
 
     /**
+     * @return {Object}
+     */
+    getPropertyConfiguration() {
+        return this._properties;
+    }
+
+    /**
      *
      * @return {{}}
+     * @api
      */
     toJSON() {
         return this.getProperties();

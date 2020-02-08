@@ -2,6 +2,7 @@ import Cache from '../Cache/Cache';
 import PasswordRepository from '../Repositories/PasswordRepository';
 import SessionAuthorization from '../Authorization/SessionAuthorization';
 import CSEv1Encryption from '../Encryption/CSEv1Encryption';
+import NoEncryption from '../Encryption/NoEncryption';
 import FolderRepository from '../Repositories/FolderRepository';
 import TagRepository from '../Repositories/TagRepository';
 import ApiRequest from '../Network/ApiRequest';
@@ -40,6 +41,19 @@ import EncryptionTypeNotSupported from '../Exception/EncryptionTypeNotSupported'
 import PasswordCollection from '../Collection/PasswordCollection';
 import FolderCollection from '../Collection/FolderCollection';
 import TagCollection from '../Collection/TagCollection';
+import PasswordConverter from '../Converter/PasswordConverter';
+import FolderConverter from '../Converter/FolderConverter';
+import TagConverter from '../Converter/TagConverter';
+import DataField from '../Model/CustomField/DataField';
+import EmailField from '../Model/CustomField/EmailField';
+import FileField from '../Model/CustomField/FileField';
+import SecretField from '../Model/CustomField/SecretField';
+import TextField from '../Model/CustomField/TextField';
+import UrlField from '../Model/CustomField/UrlField';
+import CustomFieldCollection from '../Collection/CustomFieldCollection';
+import CustomFieldConverter from '../Converter/CustomFieldConverter';
+import Setting from '../Model/Setting/Setting';
+import SettingRepository from '../Repositories/SettingRepository';
 
 export default class Api {
 
@@ -52,16 +66,7 @@ export default class Api {
     constructor(server, config = {}, classes = {}) {
         this._classes = ObjectMerger.merge(this._getDefaultClasses(), classes);
         this._instances = {};
-
-        if(!config.hasOwnProperty('userAgent')) {
-            config.userAgent = null;
-        }
-
-        if(config.hasOwnProperty('defaultEncryption') && ['auto', 'none', 'CSEv1r1'].indexOf(config.defaultEncryption) === -1) {
-            throw new ConfigurationError('Invalid default encryption');
-        }
-
-        this._config = config;
+        this._setConfig(config);
 
         if(!(server instanceof this._classes.model.server)) {
             server = this.getInstance('model.server', server);
@@ -72,6 +77,25 @@ export default class Api {
         this._server = server;
         this._session = this.getInstance('model.session', server.getUser(), server.getToken());
         this._events = this.getInstance('event.event');
+    }
+
+    /**
+     *
+     * @param config
+     * @private
+     */
+    _setConfig(config) {
+        if(!config.hasOwnProperty('userAgent')) {
+            config.userAgent = null;
+        }
+
+        if(config.hasOwnProperty('defaultEncryption') && ['auto', 'none', 'csev1'].indexOf(config.defaultEncryption) === -1) {
+            throw new ConfigurationError('Invalid default encryption');
+        } else {
+            config.defaultEncryption = 'auto';
+        }
+
+        this._config = config;
     }
 
     /**
@@ -163,8 +187,7 @@ export default class Api {
      * @returns {PasswordRepository}
      */
     getPasswordRepository() {
-        let cache = this.getInstance('cache.cache');
-        return this.getInstance('repository.password', this, cache);
+        return this.getInstance('repository.password');
     }
 
     /**
@@ -172,8 +195,7 @@ export default class Api {
      * @returns {FolderRepository}
      */
     getFolderRepository() {
-        let cache = this.getInstance('cache.cache');
-        return this.getInstance('repository.folder', this, cache);
+        return this.getInstance('repository.folder');
     }
 
     /**
@@ -181,8 +203,7 @@ export default class Api {
      * @returns {TagRepository}
      */
     getTagRepository() {
-        let cache = this.getInstance('cache.cache');
-        return this.getInstance('repository.tag', this, cache);
+        return this.getInstance('repository.tag');
     }
 
     /**
@@ -191,6 +212,29 @@ export default class Api {
      */
     getCseV1Encryption() {
         return this.getInstance('encryption.csev1');
+    }
+
+    /**
+     *
+     * @returns {CSEv1Encryption}
+     */
+    getDefaultEncryption() {
+        let mode = 'auto';
+        if(this._config.hasOwnProperty('defaultEncryption')) {
+            mode = this._config.defaultEncryption;
+        }
+
+        if(mode === 'none') {
+            return this.getInstance('encryption.none');
+        }
+        if(mode === 'csev1') {
+            return this.getInstance('encryption.csev1');
+        }
+
+        let csev1 = this.getInstance('encryption.csev1');
+        if(csev1.enabled()) return csev1;
+
+        return this.getInstance('encryption.none');
     }
 
     /**
@@ -230,8 +274,8 @@ export default class Api {
         }
 
         let creator = this._classes[path[0]][path[1]];
-        if(creator.hasOwnProperty('name') && creator.name === creator.prototype.constructor.name) {
-            if(creator.hasOwnProperty('arguments') && creator.hasOwnProperty('caller')) {
+        if(creator instanceof Function) {
+            if(!creator.prototype || creator.hasOwnProperty('arguments') && creator.hasOwnProperty('caller')) {
                 return creator(...properties);
             }
 
@@ -249,21 +293,36 @@ export default class Api {
     _getDefaultClasses() {
         return {
             repository   : {
-                password: PasswordRepository,
-                folder  : FolderRepository,
-                tag     : TagRepository
+                password: () => { return new PasswordRepository(this); },
+                folder  : () => { return new FolderRepository(this); },
+                tag     : () => { return new TagRepository(this); },
+                setting : () => { return new SettingRepository(this); }
             },
             collection   : {
-                password: PasswordCollection,
-                folder  : FolderCollection,
-                tag     : TagCollection
+                password: (...e) => { return new PasswordCollection(this.getInstance('converter.password'), ...e); },
+                folder  : (...e) => { return new FolderCollection(this.getInstance('converter.folder'), ...e); },
+                field   : (...e) => { return new CustomFieldCollection(this.getInstance('converter.field'), ...e); },
+                tag     : (...e) => { return new TagCollection(this.getInstance('converter.tag'), ...e); }
+            },
+            converter    : {
+                password: () => { return new PasswordConverter(this); },
+                folder  : () => { return new FolderConverter(this); },
+                field   : () => { return new CustomFieldConverter(this); },
+                tag     : () => { return new TagConverter(this); }
             },
             model        : {
-                password: Password,
-                folder  : Folder,
-                tag     : Tag,
-                server  : Server,
-                session : Session
+                password   : Password,
+                folder     : Folder,
+                tag        : Tag,
+                server     : Server,
+                session    : Session,
+                dataField  : DataField,
+                emailField : EmailField,
+                fileField  : FileField,
+                secretField: SecretField,
+                textField  : TextField,
+                urlField   : UrlField,
+                setting    : Setting
             },
             network      : {
                 request : ApiRequest,
@@ -280,6 +339,7 @@ export default class Api {
                 request: RequestToken
             },
             encryption   : {
+                none : NoEncryption,
                 csev1: CSEv1Encryption,
                 expv1: ExportV1Encryption
             },
