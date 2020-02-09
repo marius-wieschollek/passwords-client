@@ -19,7 +19,11 @@ export default class PasswordConverter extends AbstractConverter {
     fromObject(object) {
         let clone = ObjectClone.clone(object);
 
-        clone.customFields = this._customFieldConverter.fromJSON(clone.customFields);
+        if(typeof clone.customFields === 'string') {
+            clone.customFields = this._customFieldConverter.fromJSON(clone.customFields);
+        } else {
+            clone.customFields = this._customFieldConverter.fromArray([]);
+        }
 
         if(clone.hasOwnProperty('created') && !(clone.created instanceof Date)) {
             clone.created = new Date(clone.created * 1e3);

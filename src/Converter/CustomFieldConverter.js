@@ -9,6 +9,7 @@ export default class CustomFieldConverter {
 
     /**
      * @param {String} string
+     *
      * @return {(CustomFieldCollection|AbstractField)}
      * @api
      */
@@ -18,13 +19,25 @@ export default class CustomFieldConverter {
         if(Array.isArray(data)) {
             return this.fromArray(data);
         }
+
         if(typeof data === 'object' && data instanceof Object) {
             return this.fromObject(data);
         }
     }
 
     /**
-     * @param {Array} array
+     * @param {Object} object
+     * @return {AbstractField}
+     * @api
+     */
+    fromObject(object) {
+        let type = object.type;
+
+        return this._api.getInstance(`model.${type}Field`, object);
+    }
+
+    /**
+     * @param {Object[]} array
      * @return {CustomFieldCollection}
      * @api
      */
@@ -39,13 +52,32 @@ export default class CustomFieldConverter {
     }
 
     /**
-     * @param {Object} object
-     * @return {AbstractField}
-     * @api
+     * @param {CustomFieldCollection} collection
+     * @return {Object[]}
      */
-    fromObject(object) {
-        let type = object.type;
+    toArray(collection) {
+        let array = [];
 
-        return this._api.getInstance(`model.${type}Field`, object);
+        for(let field of collection) {
+            array.push(this.toObject(field));
+        }
+
+        return array;
+    }
+
+    /**
+     * @param {AbstractField} field
+     * @return {Object}
+     */
+    toObject(field) {
+        return field.getProperties();
+    }
+
+    /**
+     * @param {AbstractField} field
+     * @return {String}
+     */
+    toJSON(field) {
+        return JSON.stringify(field);
     }
 }
