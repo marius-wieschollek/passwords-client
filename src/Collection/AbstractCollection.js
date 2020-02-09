@@ -107,16 +107,16 @@ export default class AbstractCollection {
     }
 
     /**
-     * @return {Object[]}
+     * @return {String[]}
      */
     toJSON() {
         let json = [];
 
         for(let element of this._elements) {
-            json.push(element.toJSON());
+            json.push(this._converter.toObject(element));
         }
 
-        return json;
+        return JSON.stringify(json);
     }
 
     [Symbol.iterator]() {

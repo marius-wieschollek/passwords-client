@@ -5,28 +5,28 @@ export default class Setting {
     /**
      * @return {String}
      */
-    get SCOPE_USER() {
-        return 'user';
-    }
-
-    /**
-     * @return {String}
-     */
-    get SCOPE_SERVER() {
+    static get SCOPE_SERVER() {
         return 'server';
     }
 
     /**
      * @return {String}
      */
-    get SCOPE_CLIENT() {
+    static get SCOPE_USER() {
+        return 'user';
+    }
+
+    /**
+     * @return {String}
+     */
+    static get SCOPE_CLIENT() {
         return 'client';
     }
 
     /**
      * @return {String[]}
      */
-    get SCOPES() {
+    static get SCOPES() {
         return [
             this.SCOPE_USER,
             this.SCOPE_SERVER,
@@ -73,9 +73,7 @@ export default class Setting {
      * @param {String} value
      */
     set scope(value) {
-        if(this.SCOPES.indexOf(value) === -1) {
-            throw new InvalidScopeError(value);
-        }
+        this._checkScope(value);
 
         this._scope = value;
     }
@@ -86,9 +84,7 @@ export default class Setting {
      * @param {String} scope
      */
     constructor(name, value, scope = 'client') {
-        if(this.SCOPES.indexOf(scope) === -1) {
-            throw new InvalidScopeError(scope);
-        }
+        this._checkScope(scope);
 
         this._name = name;
         this._value = value;
@@ -147,5 +143,26 @@ export default class Setting {
         this.scope = value;
 
         return this;
+    }
+
+    /**
+     * @param {String} scope
+     * @private
+     */
+    _checkScope(scope) {
+        if(Setting.SCOPES.indexOf(scope) === -1) {
+            throw new InvalidScopeError(scope);
+        }
+    }
+
+    /**
+     * @return {{scope: String, name: String, value: String}}
+     */
+    toJSON() {
+        return {
+            scope: this._scope,
+            name : this._name,
+            value: this._value
+        };
     }
 }
