@@ -58,7 +58,7 @@ export default class SettingConverter {
             settings.push(this.fromObject(setting));
         }
 
-        return this._api.getInstance('collection.setting', settings);
+        return this._api.getClass('collection.setting', settings);
     }
 
     /**

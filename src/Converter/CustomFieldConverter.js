@@ -33,7 +33,7 @@ export default class CustomFieldConverter {
     fromObject(object) {
         let type = object.type;
 
-        return this._api.getInstance(`model.${type}Field`, object);
+        return this._api.getClass(`model.${type}Field`, object);
     }
 
     /**
@@ -48,7 +48,7 @@ export default class CustomFieldConverter {
             fields.push(this.fromObject(field));
         }
 
-        return this._api.getInstance('collection.field', fields);
+        return this._api.getClass('collection.field', fields);
     }
 
     /**
