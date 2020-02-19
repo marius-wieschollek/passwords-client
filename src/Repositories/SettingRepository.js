@@ -8,8 +8,8 @@ export default class SettingRepository {
         this._api = api;
         /** @type Cache **/
         this._cache = api.getInstance('cache.cache');
-        /** @type AbstractConverter **/
-        //this._converter = api.getInstance(`converter.setting`);
+        /** @type SettingConverter **/
+        this._converter = api.getInstance(`converter.setting`);
     }
 
     /**
@@ -22,56 +22,57 @@ export default class SettingRepository {
         return this;
     }
 
-    findAll() {
-        let request = this._api.getRequest()
-            .setPath(`1.0/settings/list`);
+    async findAll() {
+        let request = await this._api.getRequest()
+            .setPath(`1.0/settings/list`)
+            .send();
+
+        return this._converter.fromApiObject(request.getData());
     }
 
-    findByScope(scope) {
-        let request = this._api.getRequest()
+    async findByScope(scope) {
+        let request = await this._api.getRequest()
             .setPath(`1.0/settings/list`)
-            .setData([scope]);
+            .setData({scopes: [scope]})
+            .send();
+
+        return this._converter.fromApiObject(request.getData());
     }
 
-    findByScopes(scopes) {
-        let request = this._api.getRequest()
+    async findByScopes(scopes) {
+        let request = await this._api.getRequest()
             .setPath(`1.0/settings/list`)
-            .setData([scopes]);
+            .setData({scopes})
+            .send();
+
+        return this._converter.fromApiObject(request.getData());
     }
 
     async findByName(name) {
-        let data = await this._api.getRequest()
+        let request = await this._api.getRequest()
             .setPath(`1.0/settings/get`)
             .setData([name])
             .send();
+
+        return this._converter.fromApiObject(request.getData());
     }
 
-    findByNames(names) {
-        let request = this._api.getRequest()
+    async findByNames(names) {
+        let request = await this._api.getRequest()
             .setPath(`1.0/settings/get`)
             .setData(names);
+        return this._converter.fromApiObject(request.getData());
     }
 
-    set(setting) {
-        let request = this._api.getRequest()
+    async set(setting) {
+        let request = await this._api.getRequest()
             .setPath(`1.0/settings/set`)
             .setData(setting);
     }
 
-    reset(setting) {
-        let request = this._api.getRequest()
+    async reset(setting) {
+        let request = await this._api.getRequest()
             .setPath(`1.0/settings/reset`)
             .setData(setting);
-    }
-
-    /**
-     *
-     * @param {Object} data
-     * @returns {Promise<AbstractRevisionModel>}
-     * @private
-     */
-    async _dataToModel(data) {
-
-        return model;
     }
 }

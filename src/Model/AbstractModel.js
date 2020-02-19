@@ -36,7 +36,7 @@ export default class AbstractModel {
      * @param {String} property
      * @param {*} value
      *
-     * @return {AbstractModel}
+     * @return {this}
      * @api
      */
     setProperty(property, value) {
@@ -69,7 +69,7 @@ export default class AbstractModel {
     /**
      * @param {Object} properties
      *
-     * @return {AbstractModel}
+     * @return {this}
      * @api
      */
     setProperties(properties) {

@@ -62,6 +62,42 @@ export default class SettingConverter {
     }
 
     /**
+     *
+     * @param {Object} object
+     * @return {SettingCollection}
+     */
+    fromApiObject(object) {
+        let settings = [];
+
+        for(let key in object) {
+            if(!object.hasOwnProperty(key)) continue;
+            let index = key.indexOf('.'),
+                scope = key.substr(0, index),
+                name  = key.substring(index + 1),
+                value = object[key];
+
+            settings.push(this.fromObject({scope, name, value}));
+        }
+
+        return this._api.getClass('collection.setting', settings);
+    }
+
+    /**
+     * @param {SettingCollection} collection
+     * @return {Object[]}
+     */
+    toApiObject(collection) {
+        let object = {};
+
+        for(let setting of collection) {
+            let key = `${setting.scope}.${setting.name}`;
+            object[key] = setting.value;
+        }
+
+        return object;
+    }
+
+    /**
      * @param {SettingCollection} collection
      * @return {Object[]}
      */

@@ -46,7 +46,7 @@ export default class AbstractField extends AbstractModel {
 
     /**
      * @param {String} value
-     * @return {AbstractField}
+     * @return {this}
      */
     setType(value) {
         return this;
@@ -61,7 +61,7 @@ export default class AbstractField extends AbstractModel {
 
     /**
      * @param {String} value
-     * @return {AbstractField}
+     * @return {this}
      */
     setLabel(value) {
         this.label = value;
@@ -78,7 +78,7 @@ export default class AbstractField extends AbstractModel {
 
     /**
      * @param {String} value
-     * @return {AbstractField}
+     * @return {this}
      */
     setValue(value) {
         this.value = value;

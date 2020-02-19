@@ -54,6 +54,8 @@ import CustomFieldCollection from '../Collection/CustomFieldCollection';
 import CustomFieldConverter from '../Converter/CustomFieldConverter';
 import Setting from '../Model/Setting/Setting';
 import SettingRepository from '../Repositories/SettingRepository';
+import SettingConverter from '../Converter/SettingConverter';
+import SettingCollection from '../Collection/SettingCollection';
 
 export default class Api {
 
@@ -302,13 +304,15 @@ export default class Api {
                 password: (...e) => { return new PasswordCollection(this.getInstance('converter.password'), ...e); },
                 folder  : (...e) => { return new FolderCollection(this.getInstance('converter.folder'), ...e); },
                 field   : (...e) => { return new CustomFieldCollection(this.getInstance('converter.field'), ...e); },
-                tag     : (...e) => { return new TagCollection(this.getInstance('converter.tag'), ...e); }
+                tag     : (...e) => { return new TagCollection(this.getInstance('converter.tag'), ...e); },
+                setting : (...e) => { return new SettingCollection(this.getInstance('converter.setting'), ...e); }
             },
             converter    : {
                 password: () => { return new PasswordConverter(this); },
                 folder  : () => { return new FolderConverter(this); },
                 field   : () => { return new CustomFieldConverter(this); },
-                tag     : () => { return new TagConverter(this); }
+                tag     : () => { return new TagConverter(this); },
+                setting : () => { return new SettingConverter(this); }
             },
             model        : {
                 password   : Password,

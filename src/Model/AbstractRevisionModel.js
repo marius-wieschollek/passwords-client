@@ -13,7 +13,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {String} value
      *
-     * @return {AbstractModel}
+     * @return {this}
      * @api
      */
     setId(value) {
@@ -31,7 +31,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {string} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setRevision(value) {
@@ -49,7 +49,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {string} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setCseType(value) {
@@ -67,7 +67,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      *
      * @param {string} value
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setCseKey(value) {
@@ -85,7 +85,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {string} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setSseType(value) {
@@ -103,7 +103,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {string} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setClient(value) {
@@ -121,7 +121,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {Boolean} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setHidden(value) {
@@ -147,7 +147,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {Boolean} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setTrashed(value) {
@@ -173,7 +173,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {Boolean} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setFavorite(value) {
@@ -191,7 +191,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {Date} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setEdited(value) {
@@ -209,7 +209,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {Date} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setCreated(value) {
@@ -227,7 +227,7 @@ export default class AbstractRevisionModel extends AbstractModel {
     /**
      * @param {Date} value
      *
-     * @return {Password}
+     * @return {this}
      * @api
      */
     setUpdated(value) {
