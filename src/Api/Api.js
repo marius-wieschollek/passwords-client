@@ -181,7 +181,7 @@ export default class Api {
      * @returns {SessionAuthorization}
      */
     getSessionAuthorization() {
-        return this.getInstance('authorization.session', this);
+        return this.getInstance('authorization.session');
     }
 
     /**
@@ -333,7 +333,7 @@ export default class Api {
                 response: ApiResponse
             },
             authorization: {
-                session: SessionAuthorization
+                session: () => { return new SessionAuthorization(this); }
             },
             challenge    : {
                 pwdv1: PWDv1Challenge

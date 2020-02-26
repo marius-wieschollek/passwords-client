@@ -3,6 +3,13 @@ import AbstractModel from '../Model/AbstractModel';
 export default class AbstractCollection {
 
     /**
+     * @return {Number}
+     */
+    get length() {
+        return this._elements.length;
+    }
+
+    /**
      *
      * @param {AbstractConverter} converter
      * @param {AbstractModel} elements
@@ -57,6 +64,23 @@ export default class AbstractCollection {
         }
 
         return false;
+    }
+
+    /**
+     * @param {(Number|String)} index
+     * @return {AbstractModel|string|null}
+     * @api
+     */
+    get(index) {
+        if(this._elements.hasOwnProperty(index)) {
+            return this._elements[index];
+        }
+
+        for(let element in this._elements) {
+            if(element.getId() === index) return element;
+        }
+
+        return null;
     }
 
     /**
