@@ -73,7 +73,7 @@ export default class Api {
         if(!(server instanceof this._classes.model.server)) {
             server = this.getInstance('model.server', server);
         } else {
-            this._instances.model = {server};
+            this.setInstance('model.server', server);
         }
 
         this._server = server;
@@ -244,22 +244,27 @@ export default class Api {
      * @param {String} name
      * @param {*} properties
      * @return {Object}
+     * @api
      */
     getInstance(name, ...properties) {
-        let path = name.split('.');
-
-        if(this._instances.hasOwnProperty(path[0]) && this._instances[path[0]].hasOwnProperty(path[1])) {
-            return this._instances[path[0]][path[1]];
+        if(!this._instances.hasOwnProperty(name) || !this._instances[name]) {
+            this._instances[name] = this.getClass(name, ...properties);
         }
 
-        if(!this._instances.hasOwnProperty(path[0])) {
-            this._instances[path[0]] = {};
-        }
+        return this._instances[name];
+    }
 
-        let instance = this.getClass(name, ...properties);
-        this._instances[path[0]][path[1]] = instance;
+    /**
+     *
+     * @param {String} name
+     * @param {Object} object
+     * @return {Api}
+     * @api
+     */
+    setInstance(name, object) {
+        this._instances[name] = object;
 
-        return instance;
+        return this;
     }
 
     /**
@@ -285,6 +290,29 @@ export default class Api {
         } else {
             return creator;
         }
+    }
+
+    /**
+     *
+     * @param {String} name
+     * @param {Object} constructor
+     * @return {Api}
+     * @api
+     */
+    setClass(name, constructor) {
+        let path = name.split('.');
+
+        if(!this._classes.hasOwnProperty(path[0])) {
+            this._classes[path[0]] = {};
+        }
+
+        if(!this._classes[path[0]].hasOwnProperty(path[1])) {
+            this._classes[path[1]] = {};
+        }
+
+        this._classes[path[0]][path[1]] = constructor;
+
+        return this;
     }
 
     /**

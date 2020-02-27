@@ -17,6 +17,13 @@ export default class SessionAuthorization {
     }
 
     /**
+     * @return {Boolean}
+     */
+    isLoaded() {
+        return this._loaded;
+    }
+
+    /**
      *
      * @return {Promise<void>}
      */
