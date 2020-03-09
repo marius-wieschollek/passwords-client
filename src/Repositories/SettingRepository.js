@@ -23,56 +23,59 @@ export default class SettingRepository {
     }
 
     async findAll() {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/list`)
             .send();
 
-        return this._converter.fromApiObject(request.getData());
+        return this._converter.fromApiObject(response.getData());
     }
 
     async findByScope(scope) {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/list`)
             .setData({scopes: [scope]})
             .send();
 
-        return this._converter.fromApiObject(request.getData());
+        return this._converter.fromApiObject(response.getData());
     }
 
     async findByScopes(scopes) {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/list`)
             .setData({scopes})
             .send();
 
-        return this._converter.fromApiObject(request.getData());
+        return this._converter.fromApiObject(response.getData());
     }
 
     async findByName(name) {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/get`)
             .setData([name])
             .send();
 
-        return this._converter.fromApiObject(request.getData());
+        return this._converter.fromApiObject(response.getData());
     }
 
     async findByNames(names) {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/get`)
-            .setData(names);
-        return this._converter.fromApiObject(request.getData());
+            .setData(names)
+            .send();
+        return this._converter.fromApiObject(response.getData());
     }
 
     async set(setting) {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/set`)
-            .setData(setting);
+            .setData(setting)
+            .send();
     }
 
     async reset(setting) {
-        let request = await this._api.getRequest()
+        let response = await this._api.getRequest()
             .setPath(`1.0/settings/reset`)
-            .setData(setting);
+            .setData(setting)
+            .send();
     }
 }

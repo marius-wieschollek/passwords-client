@@ -34,6 +34,10 @@ export default class Setting {
         ];
     }
 
+    get id() {
+        return `${this.scope}.${this.value}`
+    }
+
     /**
      * @return {String}
      */
@@ -89,6 +93,13 @@ export default class Setting {
         this._name = name;
         this._value = value;
         this._scope = scope;
+    }
+
+    /**
+     * @return {String}
+     */
+    getId() {
+        return `${this.getScope()}.${this.getName()}`
     }
 
     /**

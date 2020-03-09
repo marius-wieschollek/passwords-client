@@ -59,7 +59,7 @@ export default class AbstractCollection {
     has(id) {
         id = typeof id === 'string' ? id:id.getId();
 
-        for(let element in this._elements) {
+        for(let element of this._elements) {
             if(element.getId() === id) return true;
         }
 
@@ -76,7 +76,7 @@ export default class AbstractCollection {
             return this._elements[index];
         }
 
-        for(let element in this._elements) {
+        for(let element of this._elements) {
             if(element.getId() === index) return element;
         }
 

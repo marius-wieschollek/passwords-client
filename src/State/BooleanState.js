@@ -42,7 +42,7 @@ export default class BooleanState {
      */
     async awaitTrue() {
         if(this._value) {
-            return new Promise((resolve) => { resolve(true); });
+            return new Promise((resolve) => resolve(true));
         }
 
         if(this._true.promise === null) {
@@ -51,7 +51,7 @@ export default class BooleanState {
             });
         }
 
-        return this._true;
+        return this._true.promise;
     }
 
     /**
@@ -60,7 +60,7 @@ export default class BooleanState {
      */
     async awaitFalse() {
         if(!this._value) {
-            return new Promise((resolve) => { resolve(false); });
+            return new Promise((resolve) => resolve(false));
         }
 
         if(this._false.promise === null) {
@@ -69,7 +69,7 @@ export default class BooleanState {
             });
         }
 
-        return this._false;
+        return this._false.promise;
     }
 
     /**
@@ -83,7 +83,7 @@ export default class BooleanState {
             });
         }
 
-        return this._change;
+        return this._change.promise;
     }
 
     /**
