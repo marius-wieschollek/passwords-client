@@ -72,7 +72,11 @@ export default class SimpleApi {
             'service.avatar'   : 'api/1.0/service/avatar/{user}/{size}',
             'service.favicon'  : 'api/1.0/service/favicon/{domain}/{size}',
             'service.preview'  : 'api/1.0/service/preview/{domain}/{view}/{width}/{height}',
-            'cron.sharing'     : 'cron/sharing'
+            'cron.sharing'     : 'cron/sharing',
+            'link.request'     : 'link/connect/request',
+            'link.await'       : 'link/connect/await',
+            'link.reject'      : 'link/connect/reject',
+            'link.confirm'     : 'link/connect/confirm'
         };
     }
 
@@ -679,6 +683,43 @@ export default class SimpleApi {
      */
     runSharingCron() {
         return this._sendRequest('cron.sharing');
+    }
+
+
+    /**
+     * Connect with PassLink
+     */
+
+    /**
+     * @returns {Promise}
+     */
+    passLinkConnectRequest() {
+        return this._sendRequest('link.request');
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    passLinkConnectAwait() {
+        return this._sendRequest('link.await');
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    passLinkConnectReject() {
+        return this._sendRequest('link.reject');
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    passLinkConnectConfirm(label) {
+        if(label) {
+            return this._sendRequest('link.confirm', {label});
+        }
+
+        return this._sendRequest('link.confirm');
     }
 
 
