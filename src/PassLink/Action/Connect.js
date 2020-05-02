@@ -115,7 +115,7 @@ export default class Connect extends PassLinkAction {
             theme['color.background'] = theme.bgColor;
             delete theme.bgColor;
         }
-        if(theme.hasOwnProperty('background')) {
+        if(theme.hasOwnProperty('background') && theme.background.substr(0, 8) !== 'https://') {
             theme.background = this._parameters.baseUrl + theme.background;
         }
         if(theme.hasOwnProperty('logo')) {
