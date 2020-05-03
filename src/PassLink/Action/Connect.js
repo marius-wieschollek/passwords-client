@@ -12,6 +12,7 @@ export default class Connect extends PassLinkAction {
         this._codes = null;
         this._clientLabel = null;
         this._theme = null;
+        this._promise = null;
     }
 
     /**
@@ -74,7 +75,20 @@ export default class Connect extends PassLinkAction {
      *
      * @return {Promise<void>}
      */
-    async apply() {
+    apply() {
+        if(this._promise === null) {
+            this._promise = this._sendRequest();
+        }
+
+        return this._promise;
+    }
+
+    /**
+     *
+     * @return {Promise<void>}
+     * @private
+     */
+    async _sendRequest() {
         let url     = `${this._parameters.baseUrl}index.php/apps/passwords/link/connect/apply`,
             request = new HttpRequest(url);
 
