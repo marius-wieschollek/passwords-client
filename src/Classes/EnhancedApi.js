@@ -757,9 +757,17 @@ export default class EnhancedApi extends SimpleApi {
      */
     _convertTags(data) {
         if(data.hasOwnProperty('tags')) {
-            for(let i = 0; i < data.tags.length; i++) {
-                let tag = data.tags[i];
-                if(typeof tag !== 'string') data.tags[i] = tag.id;
+            if(Array.isArray(data.tags)) {
+                for(let i = 0; i < data.tags.length; i++) {
+                    let tag = data.tags[i];
+                    if(typeof tag !== 'string') data.tags[i] = tag.id;
+                }
+            } else {
+                let tags = [];
+                for(let id of data.tags) {
+                    if(data.tags.hasOwnProperty(id)) tags.push(id);
+                }
+                data.tags = tags;
             }
         }
 
