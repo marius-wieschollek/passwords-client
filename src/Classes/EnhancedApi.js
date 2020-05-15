@@ -764,7 +764,7 @@ export default class EnhancedApi extends SimpleApi {
                 }
             } else {
                 let tags = [];
-                for(let id of data.tags) {
+                for(let id in data.tags) {
                     if(data.tags.hasOwnProperty(id)) tags.push(id);
                 }
                 data.tags = tags;
