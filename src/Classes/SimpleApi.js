@@ -831,6 +831,12 @@ export default class SimpleApi {
         let sessionToken = response.headers.get('X-API-SESSION');
 
         if(sessionToken && sessionToken !== this._config.sessionToken) {
+            if(response.url.indexOf('service/favicon') !== -1 ||
+               response.url.indexOf('service/preview') !== -1 ||
+               response.url.indexOf('service/avatar') !== -1) {
+                return;
+            }
+
             let oldSessionToken = this._config.sessionToken;
             this._config.sessionToken = sessionToken;
             this._headers['X-API-SESSION'] = sessionToken;

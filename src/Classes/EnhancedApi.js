@@ -535,12 +535,12 @@ export default class EnhancedApi extends SimpleApi {
      *
      * @param setting
      * @param value
-     * @returns {*}
+     * @returns {Promise<*>}
      */
-    setSetting(setting, value) {
+    async setSetting(setting, value) {
         let settings = {};
         settings[setting] = value;
-        let data = super.setSettings(settings);
+        let data = await super.setSettings(settings);
         return data[setting];
     }
 
