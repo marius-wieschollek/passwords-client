@@ -6,20 +6,8 @@ export default class SettingRepository {
      */
     constructor(api) {
         this._api = api;
-        /** @type Cache **/
-        this._cache = api.getInstance('cache.cache');
         /** @type SettingConverter **/
         this._converter = api.getInstance(`converter.setting`);
-    }
-
-    /**
-     *
-     * @return {AbstractRepository}
-     */
-    clearCache() {
-        this._cache.clear();
-
-        return this;
     }
 
     async findAll() {

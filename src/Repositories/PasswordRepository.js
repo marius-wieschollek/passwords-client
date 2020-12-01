@@ -3,10 +3,18 @@ import AbstractRepository from './AbstractRepository';
 export default class PasswordRepository extends AbstractRepository {
 
     /**
-     *
-     * @param {Api} api
+     * @return {String[]}
+     * @constructor
      */
-    constructor(api) {
-        super(api, 'password');
+    get AVAILABLE_DETAIL_LEVELS() {
+        return ['id', 'model', 'revisions', 'folder', 'tags'];
+    }
+
+    /**
+     * @returns {String}
+     * @constructor
+     */
+    get TYPE() {
+        return 'password';
     }
 }

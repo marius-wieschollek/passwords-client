@@ -44,7 +44,26 @@ export default class AbstractConverter {
             clone.edited = new Date(clone.edited * 1e3);
         }
 
-        return this._api.getClass(`model.${this._type}`, clone, this._api);
+        return this.makeModel(clone);
+    }
+
+    /**
+     *
+     * @param properties
+     * @return {*}
+     */
+    fromModel(model) {
+        // @TODO actually clone models
+        return model;
+    }
+
+    /**
+     *
+     * @param properties
+     * @return {*}
+     */
+    makeModel(properties) {
+        return this._api.getClass(`model.${this._type}`, properties, this._api);
     }
 
     /**
@@ -53,10 +72,12 @@ export default class AbstractConverter {
      * @api
      */
     async fromEncryptedData(data) {
-        if(data.cseType === 'CSEv1r1') {
-            data = await this._api.getCseV1Encryption().decrypt(data, this._type);
-        } else if(data.cseType !== 'none') {
-            throw this._api.getClass('exception.encryption', data.id, data.cseType);
+        if(data.hasOwnProperty('cseType')) {
+            if(data.cseType === 'CSEv1r1') {
+                data = await this._api.getCseV1Encryption().decrypt(data, this._type);
+            } else if(data.cseType !== 'none') {
+                throw this._api.getClass('exception.encryption', data.id, data.cseType);
+            }
         }
 
         return this.fromObject(data);

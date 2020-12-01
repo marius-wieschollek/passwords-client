@@ -1,25 +1,44 @@
 export default class AbstractRepository {
 
     /**
-     *
-     * @param {Api} api
-     * @param {String} type
+     * @return {String[]}
+     * @constructor
      */
-    constructor(api, type) {
-        this._api = api;
-        /** @type Cache **/
-        this._cache = api.getInstance('cache.cache');
-        /** @type AbstractConverter **/
-        this._converter = api.getInstance(`converter.${type}`);
-        this._type = type;
+    get AVAILABLE_DETAIL_LEVELS() {
+        return ['id', 'model'];
+    }
+
+    /**
+     * @return {String[]}
+     * @constructor
+     */
+    get DEFAULT_DETAIL_LEVEL() {
+        return ['model'];
+    }
+
+    get TYPE() {
+        return 'abstract';
     }
 
     /**
      *
+     * @param {Api} api
+     */
+    constructor(api) {
+        this._api = api;
+        /** @type {ModelService} **/
+        this._modelService = api.getInstance('service.model');
+        /** @type {AbstractConverter} **/
+        this._converter = api.getInstance(`converter.${this.TYPE}`);
+    }
+
+    /**
+     *
+     * @deprecated
      * @return {AbstractRepository}
      */
     clearCache() {
-        this._cache.clear();
+        console.trace('AbstractRepository.clearCache() is deprecated');
 
         return this;
     }
@@ -34,11 +53,12 @@ export default class AbstractRepository {
             // @TODO: Custom error here
             throw new Error('Can not create object with id');
         }
+        this._modelService.addModel(this.TYPE, model);
 
         let data    = await this._converter.toApiObject(model),
             request = this._api.getRequest()
-                .setPath(`1.0/${this._type}/create`)
-                .setData(data);
+                          .setPath(`1.0/${this.TYPE}/create`)
+                          .setData(data);
 
         try {
             let response = await request.send();
@@ -46,9 +66,6 @@ export default class AbstractRepository {
             model.setRevision(response.getData().revision);
             model.setCreated(new Date());
             model.setUpdated(new Date());
-
-            this._cache.set(model.getId(), true);
-            this._cache.set(`${model.getId()}.model`, model);
         } catch(e) {
             console.error(e);
             throw e;
@@ -70,16 +87,13 @@ export default class AbstractRepository {
 
         let data    = this._converter.toApiObject(model),
             request = this._api.getRequest()
-                .setPath(`1.0/${this._type}/update`)
-                .setData(data);
+                          .setPath(`1.0/${this.TYPE}/update`)
+                          .setData(data);
 
         try {
             let response = await request.send();
             model.setRevision(response.getData().revision);
             model.setUpdated(new Date());
-
-            this._cache.set(model.getId(), true);
-            this._cache.set(`${model.getId()}.model`, model);
         } catch(e) {
             console.error(e);
             throw e;
@@ -95,20 +109,16 @@ export default class AbstractRepository {
      */
     async delete(model) {
         let request = this._api.getRequest()
-            .setPath(`1.0/${this._type}/delete`)
-            .setData({id: model.getId(), revision: model.getRevision()});
+                          .setPath(`1.0/${this.TYPE}/delete`)
+                          .setData({id: model.getId(), revision: model.getRevision()});
 
         try {
             let response = await request.send();
             model.setRevision(response.getData().revision);
             model.setUpdated(new Date());
-            this._cache.set(`${model.getId()}.model`, model);
 
             if(!model.isTrashed()) {
                 model.setTrashed(true);
-                this._cache.set(model.getId(), true);
-            } else {
-                this._cache.remove(model.getId());
             }
         } catch(e) {
             console.error(e);
@@ -127,16 +137,14 @@ export default class AbstractRepository {
         if(!model.getTrashed()) return model;
 
         let request = this._api.getRequest()
-            .setPath(`1.0/${this._type}/restore`)
-            .setData({id: model.getId(), revision: model.getRevision()});
+                          .setPath(`1.0/${this.TYPE}/restore`)
+                          .setData({id: model.getId(), revision: model.getRevision()});
 
         try {
             let response = await request.send();
             model.setRevision(response.getData().revision);
             model.setUpdated(new Date());
             model.setTrashed(false);
-            this._cache.set(model.getId(), true);
-            this._cache.set(`${model.getId()}.model`, model);
         } catch(e) {
             console.error(e);
             throw e;
@@ -147,56 +155,54 @@ export default class AbstractRepository {
 
     /**
      *
-     * @param id
+     * @param {String} id
+     * @param {(String|String[]|null)} detailLevel
      * @returns {Promise<AbstractRevisionModel>}
      */
-    async findById(id) {
-        if(this._cache.has(id)) {
-            return this._cache.get(`${id}.model`);
-        }
+    async findById(id, detailLevel = null) {
+        detailLevel = this._getDetailLevel(detailLevel);
 
-        let request  = this._api.getRequest()
-                .setPath(`1.0/${this._type}/show`)
-                .setData({id}),
+        let details  = detailLevel.join('+'),
+            request  = this._api.getRequest()
+                           .setPath(`1.0/${this.TYPE}/show`)
+                           .setData({id, details}),
             response = await request.send();
 
-        return await this._dataToModel(response.getData());
+        return await this._dataToModel(response.getData(), detailLevel);
     }
 
     /**
      * @api
+     * @param {(String|String[]|null)} detailLevel
      * @returns {Promise<AbstractRevisionModel[]>}
      */
-    async findAll() {
-        if(this._cache.has(`${this._type}.collection`)) {
-            return this._cache.getByType(`${this._type}.collection`);
-        }
-
-        let request  = this._api.getRequest()
-                .setPath(`1.0/${this._type}/list`),
+    async findAll(detailLevel = null) {
+        detailLevel = this._getDetailLevel(detailLevel);
+        let details  = detailLevel.join('+'),
+            request  = this._api.getRequest()
+                           .setData({details})
+                           .setPath(`1.0/${this.TYPE}/list`),
             response = await request.send(),
             data     = response.getData(),
-            models   = await this._dataToModels(data);
+            models   = await this._dataToModels(data, detailLevel);
 
-        let collection = this._api.getClass(`collection.${this._type}`, models);
-        this._cache.set(`${this._type}.collection`, true);
-
-        return collection;
+        return this._api.getClass(`collection.${this.TYPE}`, models);
     }
 
     /**
      *
      * @param {Object[]} data
+     * @param {(String[])} detailLevel
      * @return {Promise<AbstractRevisionModel[]>}
      * @private
      */
-    async _dataToModels(data) {
+    async _dataToModels(data, detailLevel) {
         let promises = [],
             models   = [];
 
         for(let element of data) {
             promises.push(new Promise((resolve) => {
-                this._dataToModel(element)
+                this._dataToModel(element, detailLevel)
                     .then((model) => {
                         models.push(model);
                         resolve();
@@ -215,14 +221,32 @@ export default class AbstractRepository {
     /**
      *
      * @param {Object} data
+     * @param {String[]} detailLevel
      * @returns {Promise<AbstractRevisionModel>}
      * @private
      */
-    async _dataToModel(data) {
-        let model = await this._converter.fromEncryptedData(data);
-        this._cache.set(model.getId(), true);
-        this._cache.set(`${model.getId()}.model`, model);
+    async _dataToModel(data, detailLevel) {
+        return await this._modelService.makeFromApiData(this.TYPE, data, detailLevel);
+    }
 
-        return model;
+    /**
+     * @param {(String[]|String|null)} detailLevel
+     * @return {String[]}
+     * @private
+     */
+    _getDetailLevel(detailLevel) {
+        if(typeof detailLevel === 'string') {
+            detailLevel = detailLevel.trim().split('+');
+        }
+        if(detailLevel===null || detailLevel.length === 0) return this.DEFAULT_DETAIL_LEVEL;
+
+        for(let level of detailLevel) {
+            if(this.AVAILABLE_DETAIL_LEVELS.indexOf(level) === -1) {
+                // @TODO custom error
+                throw new Error('Unknown detail level '+level);
+            }
+        }
+
+        return detailLevel;
     }
 }

@@ -15,7 +15,12 @@
         "writeable": true
     },
     "parent": {
-        "type": "string",
+        "type": "Folder",
+        "match": "",
+        "writeable": true
+    },
+    "parentId": {
+        "type": "Folder",
         "match": "",
         "writeable": true
     },
@@ -61,5 +66,20 @@
     "updated": {
         "type": "date",
         "writeable": false
+    },
+    "revisions": {
+        "type": "FolderCollection",
+        "match": "",
+        "writeable": true
+    },
+    "passwords": {
+        "type": "PasswordCollection",
+        "match": "",
+        "writeable": true
+    },
+    "folders": {
+        "type": "FolderCollection",
+        "match": "",
+        "writeable": true
     }
 }

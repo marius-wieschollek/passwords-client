@@ -15,13 +15,22 @@ export default class AbstractModel {
     }
 
     /**
+     *
+     * @param {String} property
+     * @return {boolean}
+     */
+    hasProperty(property) {
+        return this._properties.hasOwnProperty(property);
+    }
+
+    /**
      * @param {String} property
      *
      * @return {*}
      * @api
      */
     getProperty(property) {
-        if(!this._properties.hasOwnProperty(property)) {
+        if(!this.hasProperty(property)) {
             throw new UnknownPropertyError(`Read access to unknown property ${property}`);
         }
 
@@ -40,7 +49,7 @@ export default class AbstractModel {
      * @api
      */
     setProperty(property, value) {
-        if(!this._properties.hasOwnProperty(property)) {
+        if(!this.hasProperty(property)) {
             throw new UnknownPropertyError(`Write access to unknown property ${property}`);
         }
 

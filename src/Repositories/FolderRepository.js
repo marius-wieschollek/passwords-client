@@ -3,10 +3,18 @@ import AbstractRepository from './AbstractRepository';
 export default class FolderRepository extends AbstractRepository {
 
     /**
-     *
-     * @param {Api} api
+     * @return {String[]}
+     * @constructor
      */
-    constructor(api) {
-        super(api, 'folder');
+    get AVAILABLE_DETAIL_LEVELS() {
+        return ['id', 'model', 'revisions', 'parent', 'passwords', 'folders'];
+    }
+
+    /**
+     * @returns {String}
+     * @constructor
+     */
+    get TYPE() {
+        return 'folder';
     }
 }

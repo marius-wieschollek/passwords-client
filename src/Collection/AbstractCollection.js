@@ -15,8 +15,6 @@ export default class AbstractCollection {
      * @param {AbstractModel} elements
      */
     constructor(converter, ...elements) {
-        this._index = 0;
-
         /** @type AbstractConverter **/
         this._converter = converter;
 
@@ -84,6 +82,15 @@ export default class AbstractCollection {
     }
 
     /**
+     *
+     * @param {(AbstractModel|AbstractModel[])} elements
+     */
+    replaceAll(...elements) {
+        /** @type AbstractModel[] **/
+        this._elements = this._getParamArray(elements);
+    }
+
+    /**
      * @param {(String|Object|AbstractModel)} element
      * @private
      */
@@ -144,18 +151,19 @@ export default class AbstractCollection {
     }
 
     [Symbol.iterator]() {
+        let index = 0;
         return {
             /**
              * @return {{value: AbstractModel, done: boolean}|{done: boolean}}
              */
             next: () => {
-                if(this._index < this._elements.length) {
+                if(index < this._elements.length) {
                     return {
-                        value: this._elements[this._index++],
+                        value: this._elements[index++],
                         done : false
                     };
                 } else {
-                    this._index = 0;
+                    index = 0;
                     return {done: true};
                 }
             }

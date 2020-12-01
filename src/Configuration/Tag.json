@@ -61,5 +61,15 @@
     "updated": {
         "type": "date",
         "writeable": false
+    },
+    "revisions": {
+        "type": "TagCollection",
+        "match": "",
+        "writeable": true
+    },
+    "passwords": {
+        "type": "PasswordCollection",
+        "match": "",
+        "writeable": true
     }
 }

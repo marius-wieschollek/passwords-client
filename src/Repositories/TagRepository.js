@@ -3,10 +3,18 @@ import AbstractRepository from './AbstractRepository';
 export default class TagRepository extends AbstractRepository {
 
     /**
-     *
-     * @param {Api} api
+     * @return {String[]}
+     * @constructor
      */
-    constructor(api) {
-        super(api, 'tag');
+    get AVAILABLE_DETAIL_LEVELS() {
+        return ['id', 'model', 'revisions', 'passwords'];
+    }
+
+    /**
+     * @returns {String}
+     * @constructor
+     */
+    get TYPE() {
+        return 'tag';
     }
 }

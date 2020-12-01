@@ -2,6 +2,26 @@ import AbstractModel from './AbstractModel';
 
 export default class AbstractRevisionModel extends AbstractModel {
 
+    constructor(properties, data) {
+        super(properties, data);
+        this._detailLevel = [];
+    }
+
+    /**
+     * @return {String[]}
+     */
+    getDetailLevel() {
+        return this._detailLevel;
+    }
+
+    /**
+     * @param {String[]} value
+     * @return {AbstractRevisionModel}
+     */
+    setDetailLevel(value) {
+        return this._detailLevel;
+    }
+
     /**
      * @return {String}
      * @api
@@ -108,6 +128,14 @@ export default class AbstractRevisionModel extends AbstractModel {
      */
     setClient(value) {
         return this.setProperty('client', value);
+    }
+
+    /**
+     * @return {Boolean}
+     * @api
+     */
+    isHidden() {
+        return this.getProperty('hidden');
     }
 
     /**

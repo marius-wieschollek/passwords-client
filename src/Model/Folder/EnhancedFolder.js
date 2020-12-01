@@ -22,17 +22,49 @@ export default class EnhancedFolder extends Folder {
 
     /**
      *
-     * @returns {Promise<Folder[]>}
+     * @returns {Promise<FolderCollection[]>}
      */
     async fetchRevisions() {
+        if(this.getProperty('revisions') === undefined) {
+            await this._api.getFolderRepository().findById(this.getId(), 'revisions');
+        }
 
+        return this.getProperty('revisions');
     }
 
     /**
      *
-     * @returns {Promise<Password[]>}
+     * @returns {Promise<PasswordCollection[]>}
      */
     async fetchPasswords() {
+        if(this.getProperty('passwords') === undefined) {
+            await this._api.getFolderRepository().findById(this.getId(), 'passwords');
+        }
 
+        return this.getProperty('passwords');
+    }
+
+    /**
+     *
+     * @returns {Promise<FolderCollection[]>}
+     */
+    async fetchFolders() {
+        if(this.getProperty('folders') === undefined) {
+            await this._api.getFolderRepository().findById(this.getId(), 'folders');
+        }
+
+        return this.getProperty('folders');
+    }
+
+    /**
+     *
+     * @returns {Promise<Folder[]>}
+     */
+    async fetchParent() {
+        if(this.getProperty('parent') === undefined) {
+            await this._api.getFolderRepository().findById(this.getId(), 'parent');
+        }
+
+        return this.getProperty('parent');
     }
 }
