@@ -85,8 +85,9 @@ export default class AbstractRepository {
             throw new Error('Can not update object without id');
         }
 
-        let data    = this._converter.toApiObject(model),
+        let data    = await this._converter.toApiObject(model),
             request = this._api.getRequest()
+                          .setMethod('PATCH')
                           .setPath(`1.0/${this.TYPE}/update`)
                           .setData(data);
 

@@ -13,6 +13,7 @@ export default class ApiRequest {
         this._url = url;
         this._path = null;
         this._data = null;
+        this._method = null;
         this._userAgent = null;
         this._session = session;
         this._responseType = 'application/json';
@@ -82,6 +83,17 @@ export default class ApiRequest {
      * @param {String} value
      * @return {ApiRequest}
      */
+    setMethod(value) {
+        this._method = value.toUpperCase();
+
+        return this;
+    }
+
+    /**
+     *
+     * @param {String} value
+     * @return {ApiRequest}
+     */
     setUserAgent(value) {
         this._userAgent = value;
 
@@ -128,13 +140,12 @@ export default class ApiRequest {
      */
     _getRequestOptions() {
         let headers = this._getRequestHeaders();
-        let method = 'GET';
+        let method = this._method === null ? 'GET':this._method;
         let options = {method, headers, credentials: 'omit', redirect: 'error'};
         if(this._data !== null) {
             options.body = JSON.stringify(this._data);
-            method = 'POST';
+            if(method === 'GET') options.method = 'POST';
         }
-        options.method = method;
 
         return options;
     }
