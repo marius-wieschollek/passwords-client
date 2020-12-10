@@ -161,7 +161,7 @@ export default class ModelService {
 
             let cacheKey = `${baseType}.${model.getId()}.${property}`;
             if(this._cache.has(cacheKey)) {
-                let collection = /** @type {AbstractCollection} **/ this._cache.has(cacheKey);
+                let collection = /** @type {AbstractCollection} **/ this._cache.get(cacheKey);
                 collection.replaceAll(models);
                 model.setProperty(property, collection);
             } else {
