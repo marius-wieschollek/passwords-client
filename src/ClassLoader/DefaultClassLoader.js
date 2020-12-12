@@ -57,6 +57,7 @@ import ServiceUnavailableError from "../Exception/Http/ServiceUnavailableError";
 import GatewayTimeoutError from "../Exception/Http/GatewayTimeoutError";
 import BaseClassLoader from "./BaseClassLoader";
 import ModelService from "../Services/ModelService";
+import PasswordService from "../Services/PasswordService";
 
 export default class DefaultClassLoader extends BaseClassLoader {
 
@@ -123,8 +124,9 @@ export default class DefaultClassLoader extends BaseClassLoader {
             keychain     : {
                 csev1: CSEv1Keychain
             },
-            service     : {
-                model: () => { return new ModelService(this); }
+            service      : {
+                model   : () => { return new ModelService(this); },
+                password: () => { return new PasswordService(this.getInstance('api')); }
             },
             cache        : {
                 cache: Cache
