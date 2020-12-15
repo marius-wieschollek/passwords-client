@@ -22,7 +22,7 @@ export default class EnhancedFolder extends Folder {
 
     /**
      *
-     * @returns {Promise<FolderCollection[]>}
+     * @returns {Promise<FolderCollection>}
      */
     async fetchRevisions() {
         if(this.getProperty('revisions') === undefined) {
@@ -34,7 +34,7 @@ export default class EnhancedFolder extends Folder {
 
     /**
      *
-     * @returns {Promise<PasswordCollection[]>}
+     * @returns {Promise<PasswordCollection>}
      */
     async fetchPasswords() {
         if(this.getProperty('passwords') === undefined) {
@@ -46,7 +46,7 @@ export default class EnhancedFolder extends Folder {
 
     /**
      *
-     * @returns {Promise<FolderCollection[]>}
+     * @returns {Promise<FolderCollection>}
      */
     async fetchFolders() {
         if(this.getProperty('folders') === undefined) {
@@ -58,7 +58,7 @@ export default class EnhancedFolder extends Folder {
 
     /**
      *
-     * @returns {Promise<Folder[]>}
+     * @returns {Promise<Folder>}
      */
     async fetchParent() {
         if(this.getProperty('parent') === undefined) {

@@ -63,35 +63,35 @@ export default class EnhancedPassword extends Password {
 
     /**
      *
-     * @returns {Promise<Password[]>}
+     * @returns {Promise<PasswordCollection>}
      */
     async fetchRevisions() {
     }
 
     /**
      *
-     * @returns {Promise<Share[]>}
+     * @returns {Promise<Share>}
      */
     async fetchShare() {
     }
 
     /**
      *
-     * @returns {Promise<Share[]>}
+     * @returns {Promise<ShareCollection>}
      */
     async fetchShares() {
     }
 
     /**
      *
-     * @returns {Promise<Tag[]>}
+     * @returns {Promise<TagCollection>}
      */
     async fetchTags() {
     }
 
     /**
      *
-     * @returns {Promise<Folder[]>}
+     * @returns {Promise<FolderCollection>}
      */
     async fetchFolder() {
     }

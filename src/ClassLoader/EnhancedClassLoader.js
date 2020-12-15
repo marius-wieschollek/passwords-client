@@ -11,9 +11,9 @@ export default class EnhancedClassLoader extends DefaultClassLoader {
      */
     _getDefaultClasses() {
         let classes = super._getDefaultClasses();
-        classes.model.password = EnhancedPassword;
-        classes.model.folder = EnhancedFolder;
-        classes.model.tag = EnhancedTag;
+        classes.model.password = (d) => { return new EnhancedPassword(d, this.getInstance('api')); };
+        classes.model.folder = (d) => { return new EnhancedFolder(d, this.getInstance('api')); };
+        classes.model.tag = (d) => { return new EnhancedTag(d, this.getInstance('api')); };
 
         return classes;
     }

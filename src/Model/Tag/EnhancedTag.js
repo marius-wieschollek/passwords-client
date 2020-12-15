@@ -22,7 +22,7 @@ export default class EnhancedTag extends Tag {
 
     /**
      *
-     * @returns {Promise<Tag[]>}
+     * @returns {Promise<TagCollection>}
      */
     async fetchRevisions() {
 
@@ -30,7 +30,7 @@ export default class EnhancedTag extends Tag {
 
     /**
      *
-     * @returns {Promise<Password[]>}
+     * @returns {Promise<PasswordCollection>}
      */
     async fetchPasswords() {
 
