@@ -53,7 +53,6 @@ export default class AbstractRepository {
             // @TODO: Custom error here
             throw new Error('Can not create object with id');
         }
-        this._modelService.addModel(this.TYPE, model);
 
         let data    = await this._converter.toApiObject(model),
             request = this._api.getRequest()
@@ -66,6 +65,7 @@ export default class AbstractRepository {
             model.setRevision(response.getData().revision);
             model.setCreated(new Date());
             model.setUpdated(new Date());
+            this._modelService.addModel(this.TYPE, model);
         } catch(e) {
             console.error(e);
             throw e;
