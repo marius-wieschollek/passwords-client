@@ -175,11 +175,13 @@ export default class ModelService {
     /**
      *
      * @param {Password} model
-     * @param {Password}  newModel
+     * @param {Password} newModel
      * @returns {Password}
      * @private
      */
     _mergePasswordModel(model, newModel) {
+        this._mergeStandardProperties(model, newModel, ['tags', 'folder']);
+
         if(newModel.getProperty('revisions') !== undefined) {
             model.setProperty('revisions', newModel.getProperty('revisions'));
         }
@@ -197,11 +199,13 @@ export default class ModelService {
     /**
      *
      * @param {Folder} model
-     * @param {Folder}  newModel
+     * @param {Folder} newModel
      * @returns {Folder}
      * @private
      */
     _mergeFolderModel(model, newModel) {
+        this._mergeStandardProperties(model, newModel, ['passwords', 'folders', 'parent']);
+
         if(newModel.getProperty('revisions') !== undefined) {
             model.setProperty('revisions', newModel.getProperty('revisions'));
         }
@@ -222,11 +226,13 @@ export default class ModelService {
     /**
      *
      * @param {Tag} model
-     * @param {Tag}  newModel
+     * @param {Tag} newModel
      * @returns {Tag}
      * @private
      */
     _mergeTagModel(model, newModel) {
+        this._mergeStandardProperties(model, newModel, ['passwords']);
+
         if(newModel.getProperty('revisions') !== undefined) {
             model.setProperty('revisions', newModel.getProperty('revisions'));
         }
@@ -236,6 +242,28 @@ export default class ModelService {
         this._mergeModelDetailLevel(model, newModel.getDetailLevel());
 
         return newModel;
+    }
+
+    /**
+     *
+     * @param {AbstractRevisionModel} model
+     * @param {AbstractRevisionModel} newModel
+     * @param {String[]} excludeProperties
+     * @private
+     */
+    _mergeStandardProperties(model, newModel, excludeProperties) {
+        if(model.getRevision() === newModel.getRevision()) {
+            model.setUpdated(newModel.getUpdated());
+            return;
+        }
+
+        excludeProperties.push('id, revisions')
+        let configuration = model.getPropertyConfiguration();
+        for(let key in configuration) {
+            if(configuration.hasOwnProperty(key) && excludeProperties.indexOf(key) === -1 && newModel.getProperty(key) !== undefined) {
+                model.setProperty(key, newModel.getProperty(key));
+            }
+        }
     }
 
     /**
