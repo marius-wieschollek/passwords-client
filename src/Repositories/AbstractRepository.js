@@ -66,7 +66,7 @@ export default class AbstractRepository {
             model.setCreated(new Date());
             model.setUpdated(new Date());
             this._modelService.addModel(this.TYPE, model);
-            this.findById(model.getId());
+            await this.findById(model.getId());
         } catch(e) {
             console.error(e);
             throw e;
