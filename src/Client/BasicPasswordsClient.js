@@ -13,6 +13,7 @@ export default class BasicPasswordsClient {
         this._classes = classes;
         this._classes.setInstance('model.server', server);
         this._classes.setInstance('api', this);
+        this._classes.setInstance('client', this);
 
         this._server = server;
         this._session = this._classes.getInstance('model.session', server.getUser(), server.getToken());
@@ -61,6 +62,15 @@ export default class BasicPasswordsClient {
      */
     getServer() {
         return this._server;
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    isAuthorized() {
+        return this
+            .getSession()
+            .getAuthorized();
     }
 
     /**
@@ -174,6 +184,13 @@ export default class BasicPasswordsClient {
      */
     getClass(...parameters) {
         return this._classes.getClass(...parameters)
+    }
+
+    /**
+     * @returns {Object}
+     */
+    toJSON() {
+        return this.getServer().getProperties();
     }
 
     /**

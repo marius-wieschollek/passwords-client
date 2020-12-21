@@ -31,7 +31,7 @@ export default class AbstractModel {
      */
     getProperty(property) {
         if(!this.hasProperty(property)) {
-            throw new UnknownPropertyError(`Read access to unknown property ${property}`);
+            throw new UnknownPropertyError(property, this);
         }
 
         if(!this._data.hasOwnProperty(property)) {
@@ -50,7 +50,7 @@ export default class AbstractModel {
      */
     setProperty(property, value) {
         if(!this.hasProperty(property)) {
-            throw new UnknownPropertyError(`Write access to unknown property ${property}`);
+            throw new UnknownPropertyError(property, this);
         }
 
         this._originalData[property] = this._data[property];
