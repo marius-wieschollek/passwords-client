@@ -1,6 +1,6 @@
 import ObjectMerger from "../Utility/ObjectMerger";
 
-export default class BaseClassLoader {
+export default class BasicClassLoader {
 
     constructor(classes = {}) {
         this._classes = ObjectMerger.merge(this._getDefaultClasses(), classes);
@@ -27,7 +27,7 @@ export default class BaseClassLoader {
      *
      * @param {String} name
      * @param {Object} object
-     * @return {BaseClassLoader}
+     * @return {BasicClassLoader}
      * @api
      */
     setInstance(name, object) {
@@ -65,7 +65,7 @@ export default class BaseClassLoader {
      *
      * @param {String} name
      * @param {Object} constructor
-     * @return {BaseClassLoader}
+     * @return {BasicClassLoader}
      * @api
      */
     registerClass(name, constructor) {

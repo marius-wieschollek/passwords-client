@@ -3,7 +3,7 @@ import ObjectClone from '../Utility/ObjectClone';
 export default class AbstractConverter {
 
     /**
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      * @param {String} type
      */
     constructor(api, type) {

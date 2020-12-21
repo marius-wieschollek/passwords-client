@@ -2,7 +2,7 @@ export default class AbstractToken {
 
     /**
      *
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      * @param {String} id
      * @param {String} label
      * @param {String} description

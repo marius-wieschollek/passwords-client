@@ -2,7 +2,7 @@ export default class SettingRepository {
 
     /**
      *
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      */
     constructor(api) {
         this._api = api;

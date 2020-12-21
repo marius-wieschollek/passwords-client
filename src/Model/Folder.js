@@ -7,7 +7,7 @@ export default class Folder extends EnhancedFolder {
 
     /**
      *
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      * @param {Object} [data={}]
      */
     constructor(api, data = {}) {

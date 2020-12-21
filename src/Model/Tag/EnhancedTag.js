@@ -5,7 +5,7 @@ export default class EnhancedTag extends Tag {
     /**
      *
      * @param {Object} [data={}]
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      */
     constructor(data = {}, api) {
         super(data);

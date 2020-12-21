@@ -4,7 +4,7 @@ import ObjectClone from '../Utility/ObjectClone';
 export default class PasswordConverter extends AbstractConverter {
 
     /**
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      */
     constructor(api) {
         super(api, 'password');

@@ -55,11 +55,11 @@ import InternalServerError from "../Exception/Http/InternalServerError";
 import BadGatewayError from "../Exception/Http/BadGatewayError";
 import ServiceUnavailableError from "../Exception/Http/ServiceUnavailableError";
 import GatewayTimeoutError from "../Exception/Http/GatewayTimeoutError";
-import BaseClassLoader from "./BaseClassLoader";
+import BasicClassLoader from "./BasicClassLoader";
 import ModelService from "../Services/ModelService";
 import PasswordService from "../Services/PasswordService";
 
-export default class DefaultClassLoader extends BaseClassLoader {
+export default class DefaultClassLoader extends BasicClassLoader {
 
     /**
      *

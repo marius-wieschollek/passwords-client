@@ -5,7 +5,7 @@ export default class EnhancedPassword extends Password {
 
     /**
      *
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      * @param {Object} [data={}]
      */
     constructor(data = {}, api) {

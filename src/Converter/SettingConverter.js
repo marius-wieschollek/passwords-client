@@ -1,7 +1,7 @@
 export default class SettingConverter {
 
     /**
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      */
     constructor(api) {
         this._api = api;

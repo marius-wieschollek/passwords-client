@@ -4,7 +4,7 @@ export default class ApiRequest {
 
     /**
      *
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      * @param {String} [url=null]
      * @param {Session} [session=null]
      */

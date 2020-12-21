@@ -3,7 +3,7 @@ import AbstractConverter from './AbstractConverter';
 export default class FolderConverter extends AbstractConverter {
 
     /**
-     * @param {Api} api
+     * @param {BasicPasswordsClient} api
      */
     constructor(api) {
         super(api, 'folder');

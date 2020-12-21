@@ -107,7 +107,8 @@ export default class SimpleApi {
         if(config.user !== null && config.password !== null) {
             this._headers.Authorization = `Basic ${btoa(`${config.user}:${config.password}`)}`;
         } else {
-            throw new Error('Api username or password missing');
+            // @TODO Use custom error here
+            throw new Error('API username or password missing');
         }
 
         this._enabled = true;

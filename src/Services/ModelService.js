@@ -2,7 +2,7 @@ export default class ModelService {
 
     /**
      *
-     * @param {BaseClassLoader} cl
+     * @param {BasicClassLoader} cl
      */
     constructor(cl) {
         this._cl = cl;
