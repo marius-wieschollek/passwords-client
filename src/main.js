@@ -12,10 +12,8 @@ import EnhancedTag from "./Model/Tag/EnhancedTag";
 import Tag from "./Model/Tag/Tag";
 import Server from "./Model/Server/Server";
 
-/** @deprecated **/
-const Api = PasswordsClient;
-
 export default PasswordsClient;
+
 export {
     PasswordsClient,
     BasicPasswordsClient,
@@ -29,6 +27,5 @@ export {
     Password,
     Folder,
     Tag,
-    Server,
-    Api
+    Server
 };

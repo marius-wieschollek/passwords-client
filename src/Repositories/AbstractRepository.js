@@ -199,26 +199,30 @@ export default class AbstractRepository {
      * @return {Promise<AbstractRevisionModel[]>}
      * @private
      */
-    async _dataToModels(data, detailLevel) {
-        let promises = [],
-            models   = [];
+    _dataToModels(data, detailLevel) {
+        return new Promise(async (resolve, reject) => {
+            let promises = [],
+                models   = [];
 
-        for(let element of data) {
-            promises.push(new Promise((resolve) => {
-                this._dataToModel(element, detailLevel)
-                    .then((model) => {
-                        models.push(model);
-                        resolve();
-                    })
-                    .catch((e) => {
-                        console.error(e, element);
-                    });
-            }));
-        }
+            for(let element of data) {
+                promises.push(
+                    new Promise(
+                        (resolve) => {
+                            this._dataToModel(element, detailLevel)
+                                .then((model) => {
+                                    models.push(model);
+                                    resolve();
+                                })
+                                .catch(reject);
+                        }
+                    )
+                );
+            }
 
-        await Promise.all(promises);
+            await Promise.all(promises);
 
-        return models;
+            resolve(models);
+        });
     }
 
     /**
@@ -241,12 +245,12 @@ export default class AbstractRepository {
         if(typeof detailLevel === 'string') {
             detailLevel = detailLevel.trim().split('+');
         }
-        if(detailLevel===null || detailLevel.length === 0) return this.DEFAULT_DETAIL_LEVEL;
+        if(detailLevel === null || detailLevel.length === 0) return this.DEFAULT_DETAIL_LEVEL;
 
         for(let level of detailLevel) {
             if(this.AVAILABLE_DETAIL_LEVELS.indexOf(level) === -1) {
                 // @TODO custom error
-                throw new Error('Unknown detail level '+level);
+                throw new Error('Unknown detail level ' + level);
             }
         }
 

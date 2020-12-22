@@ -1,4 +1,3 @@
-import PWDv1Challenge from './Challenge/PWDv1Challenge';
 import CSEv1Keychain from '../Encryption/Keychain/CSEv1Keychain';
 import AbstractToken from './Token/AbstractToken';
 

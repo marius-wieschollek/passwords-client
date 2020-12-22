@@ -1,17 +1,20 @@
 import sodium from 'libsodium-wrappers';
-import BooleanState from '../State/BooleanState';
 
 export default class CSEv1Encryption {
 
-    constructor() {
+    /**
+     * @param {BasicClassLoader} classLoader
+     */
+    constructor(classLoader) {
         this.fields = {
             password: ['url', 'label', 'notes', 'password', 'username', 'customFields'],
             folder  : ['label'],
             tag     : ['label', 'color']
         };
-        this._enabled = new BooleanState(false);
-        this._ready = new BooleanState(false);
+        this._enabled = classLoader.getClass('state.boolean', false);
+        this._ready = classLoader.getClass('state.boolean', false);
         this._keychain = null;
+        this._classLoader = classLoader;
 
         sodium.ready.then(() => {this._ready.set(true);});
     }
@@ -22,6 +25,7 @@ export default class CSEv1Encryption {
      */
     async ready() {
         await this._ready.awaitTrue() && await this._enabled.awaitTrue();
+        return true;
     }
 
     /**
@@ -29,7 +33,7 @@ export default class CSEv1Encryption {
      * @returns {Boolean}
      */
     enabled() {
-        this._ready.get() && this._enabled.get();
+        return this._ready.get() && this._enabled.get();
     }
 
     /**
@@ -40,9 +44,8 @@ export default class CSEv1Encryption {
      * @returns {Object}
      */
     async encrypt(object, type) {
-        // TODO custom errors here
-        if(!this.fields.hasOwnProperty(type)) throw new Error('Invalid object type');
-        await this.ready();
+        if(!this.fields.hasOwnProperty(type)) throw this._classLoader.getClass('exception.encryption.object');
+        if(!this.enabled()) throw this._classLoader.getClass('exception.encryption.enabled');
 
         let fields = this.fields[type],
             key    = this._keychain.getCurrentKey();
@@ -69,10 +72,9 @@ export default class CSEv1Encryption {
      * @returns {Object}
      */
     async decrypt(object, type) {
-        // TODO custom errors here
-        if(!this.fields.hasOwnProperty(type)) throw new Error('Invalid object type');
-        if(object.cseType !== 'CSEv1r1') throw new Error('Unsupported encryption type');
-        await this.ready();
+        if(!this.fields.hasOwnProperty(type)) throw this._classLoader.getClass('exception.encryption.object');
+        if(object.cseType !== 'CSEv1r1') throw this._classLoader.getClass('exception.encryption.unsupported', object, 'CSEv1r1');
+        if(!this.enabled()) throw this._classLoader.getClass('exception.encryption.enabled');
 
         let fields = this.fields[type],
             key    = this._keychain.getKey(object.cseKey);

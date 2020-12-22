@@ -14,10 +14,11 @@ export default class BasicPasswordsClient {
         this._classes.setInstance('model.server', server);
         this._classes.setInstance('api', this);
         this._classes.setInstance('client', this);
+        this._classes.setInstance('classes', this._classes);
 
         this._server = server;
-        this._session = this._classes.getInstance('model.session', server.getUser(), server.getToken());
         this._events = this._classes.getInstance('event.event');
+        this.renewSession();
     }
 
     /**
@@ -79,7 +80,7 @@ export default class BasicPasswordsClient {
      */
     getRequest() {
         /** @type {ApiRequest} **/
-        let request = this.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
+        let request = this._classes.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
         if(this._config.userAgent !== null) {
             request.setUserAgent(this._config.userAgent);
         }
@@ -91,9 +92,23 @@ export default class BasicPasswordsClient {
      * @returns {Session}
      */
     getSession() {
-        return this._session
-                   .setUser(this._server.getUser())
-                   .setToken(this._server.getToken());
+        return this
+            ._session
+            .setUser(this._server.getUser())
+            .setToken(this._server.getToken());
+    }
+
+    /**
+     * Replaces the session with a blank one
+     *
+     * @returns {Session}
+     */
+    renewSession() {
+        this._session = this._classes.getClass('model.session', this._server.getUser(), this._server.getToken());
+        this._classes.setInstance('session', this._session);
+        this._classes.setInstance('model.session', this._session);
+        this._classes.setInstance('authorization.session', this._classes.getClass('authorization.session'));
+        return this._session;
     }
 
     /**
@@ -101,7 +116,7 @@ export default class BasicPasswordsClient {
      * @returns {SessionAuthorization}
      */
     getSessionAuthorization() {
-        return this.getInstance('authorization.session');
+        return this._classes.getInstance('authorization.session');
     }
 
     /**
@@ -109,7 +124,7 @@ export default class BasicPasswordsClient {
      * @returns {PasswordRepository}
      */
     getPasswordRepository() {
-        return this.getInstance('repository.password');
+        return this._classes.getInstance('repository.password');
     }
 
     /**
@@ -117,7 +132,7 @@ export default class BasicPasswordsClient {
      * @returns {FolderRepository}
      */
     getFolderRepository() {
-        return this.getInstance('repository.folder');
+        return this._classes.getInstance('repository.folder');
     }
 
     /**
@@ -125,7 +140,7 @@ export default class BasicPasswordsClient {
      * @returns {TagRepository}
      */
     getTagRepository() {
-        return this.getInstance('repository.tag');
+        return this._classes.getInstance('repository.tag');
     }
 
     /**
@@ -133,7 +148,7 @@ export default class BasicPasswordsClient {
      * @returns {CSEv1Encryption}
      */
     getCseV1Encryption() {
-        return this.getInstance('encryption.csev1');
+        return this._classes.getInstance('encryption.csev1');
     }
 
     /**
@@ -147,16 +162,16 @@ export default class BasicPasswordsClient {
         }
 
         if(mode === 'none') {
-            return this.getInstance('encryption.none');
+            return this._classes.getInstance('encryption.none');
         }
         if(mode === 'csev1') {
-            return this.getInstance('encryption.csev1');
+            return this._classes.getInstance('encryption.csev1');
         }
 
-        let csev1 = this.getInstance('encryption.csev1');
+        let csev1 = this._classes.getInstance('encryption.csev1');
         if(csev1.enabled()) return csev1;
 
-        return this.getInstance('encryption.none');
+        return this._classes.getInstance('encryption.none');
     }
 
     /**
@@ -165,7 +180,7 @@ export default class BasicPasswordsClient {
      * @return {*}
      */
     getInstance(...parameters) {
-        return this._classes.getInstance(...parameters)
+        return this._classes.getInstance(...parameters);
     }
 
     /**
@@ -174,7 +189,7 @@ export default class BasicPasswordsClient {
      * @return {*}
      */
     setInstance(...parameters) {
-        return this._classes.setInstance(...parameters)
+        return this._classes.setInstance(...parameters);
     }
 
     /**
@@ -183,7 +198,7 @@ export default class BasicPasswordsClient {
      * @return {*}
      */
     getClass(...parameters) {
-        return this._classes.getClass(...parameters)
+        return this._classes.getClass(...parameters);
     }
 
     /**
