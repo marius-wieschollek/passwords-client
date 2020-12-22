@@ -37,12 +37,10 @@ import CSEv1Keychain from "../Encryption/Keychain/CSEv1Keychain";
 import Cache from "../Cache/Cache";
 import BooleanState from "../State/BooleanState";
 import EventEmitter from "eventemitter3";
-import ConfigurationError from "../Exception/ConfigruationError";
 import ResponseContentTypeError from "../Exception/ResponseContentTypeError";
 import ResponseDecodingError from "../Exception/ResponseDecodingError";
 import UnknownPropertyError from "../Exception/UnknownPropertyError";
 import TokenTypeNotSupported from "../Exception/TokenTypeNotSupported";
-import EncryptionTypeNotSupported from "../Exception/EncryptionTypeNotSupported";
 import NetworkError from "../Exception/NetworkError";
 import HttpError from "../Exception/Http/HttpError";
 import BadRequestError from "../Exception/Http/BadRequestError";
@@ -58,6 +56,11 @@ import GatewayTimeoutError from "../Exception/Http/GatewayTimeoutError";
 import BasicClassLoader from "./BasicClassLoader";
 import ModelService from "../Services/ModelService";
 import PasswordService from "../Services/PasswordService";
+import UnsupportedEncryptionTypeError from "../Exception/Encryption/UnsupportedEncryptionTypeError";
+import InvalidObjectTypeError from "../Exception/Encryption/InvalidObjectTypeError";
+import EncryptionNotEnabledError from "../Exception/Encryption/EncryptionNotEnabledError";
+import ChallengeTypeNotSupported from "../Exception/ChallengeTypeNotSupported";
+import ConfigurationError from "../Exception/ConfigruationError";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -68,96 +71,100 @@ export default class DefaultClassLoader extends BasicClassLoader {
      */
     _getDefaultClasses() {
         return {
-            repository   : {
-                password: () => { return new PasswordRepository(this.getInstance('api')); },
-                folder  : () => { return new FolderRepository(this.getInstance('api')); },
-                tag     : () => { return new TagRepository(this.getInstance('api')); },
-                setting : () => { return new SettingRepository(this.getInstance('api')); }
-            },
-            collection   : {
-                password: (...e) => { return new PasswordCollection(this.getInstance('converter.password'), ...e); },
-                folder  : (...e) => { return new FolderCollection(this.getInstance('converter.folder'), ...e); },
-                field   : (...e) => { return new CustomFieldCollection(this.getInstance('converter.field'), ...e); },
-                tag     : (...e) => { return new TagCollection(this.getInstance('converter.tag'), ...e); },
-                setting : (...e) => { return new SettingCollection(this.getInstance('converter.setting'), ...e); }
-            },
-            converter    : {
-                password: () => { return new PasswordConverter(this.getInstance('api')); },
-                folder  : () => { return new FolderConverter(this.getInstance('api')); },
-                field   : () => { return new CustomFieldConverter(this.getInstance('api')); },
-                tag     : () => { return new TagConverter(this.getInstance('api')); },
-                setting : () => { return new SettingConverter(this.getInstance('api')); }
-            },
-            model        : {
-                password   : Password,
-                folder     : Folder,
-                tag        : Tag,
-                server     : Server,
-                session    : Session,
-                dataField  : DataField,
-                emailField : EmailField,
-                fileField  : FileField,
-                secretField: SecretField,
-                textField  : TextField,
-                urlField   : UrlField,
-                setting    : Setting
-            },
-            network      : {
-                request : ApiRequest,
-                response: ApiResponse
-            },
-            authorization: {
-                session: () => { return new SessionAuthorization(this.getInstance('api')); }
-            },
-            challenge    : {
-                pwdv1: PWDv1Challenge
-            },
-            token        : {
-                user   : UserToken,
-                request: RequestToken
-            },
-            encryption   : {
-                none : NoEncryption,
-                csev1: CSEv1Encryption,
-                expv1: ExportV1Encryption
-            },
-            keychain     : {
-                csev1: CSEv1Keychain
-            },
-            service      : {
-                model   : () => { return new ModelService(this); },
-                password: () => { return new PasswordService(this.getInstance('api')); }
-            },
-            cache        : {
-                cache: Cache
-            },
-            state        : {
-                boolean: BooleanState
-            },
-            event        : {
-                event: EventEmitter
-            },
-            exception    : {
-                configuration: ConfigurationError,
-                contenttype  : ResponseContentTypeError,
-                decoding     : ResponseDecodingError,
-                property     : UnknownPropertyError,
-                challenge    : TokenTypeNotSupported,
-                token        : TokenTypeNotSupported,
-                encryption   : EncryptionTypeNotSupported,
-                network      : NetworkError,
-                http         : HttpError,
-                400          : BadRequestError,
-                401          : UnauthorizedError,
-                403          : ForbiddenError,
-                404          : NotFoundError,
-                405          : MethodNotAllowedError,
-                429          : TooManyRequestsError,
-                500          : InternalServerError,
-                502          : BadGatewayError,
-                503          : ServiceUnavailableError,
-                504          : GatewayTimeoutError
-            }
+            'repository.password': () => { return new PasswordRepository(this.getInstance('client')); },
+            'repository.folder'  : () => { return new FolderRepository(this.getInstance('client')); },
+            'repository.tag'     : () => { return new TagRepository(this.getInstance('client')); },
+            'repository.setting' : () => { return new SettingRepository(this.getInstance('client')); },
+
+            'collection.password': (...e) => { return new PasswordCollection(this.getInstance('converter.password'), ...e); },
+            'collection.folder'  : (...e) => { return new FolderCollection(this.getInstance('converter.folder'), ...e); },
+            'collection.field'   : (...e) => { return new CustomFieldCollection(this.getInstance('converter.field'), ...e); },
+            'collection.tag'     : (...e) => { return new TagCollection(this.getInstance('converter.tag'), ...e); },
+            'collection.setting' : (...e) => { return new SettingCollection(this.getInstance('converter.setting'), ...e); },
+
+            'converter.password': () => { return new PasswordConverter(this.getInstance('client')); },
+            'converter.folder'  : () => { return new FolderConverter(this.getInstance('client')); },
+            'converter.field'   : () => { return new CustomFieldConverter(this.getInstance('client')); },
+            'converter.tag'     : () => { return new TagConverter(this.getInstance('client')); },
+            'converter.setting' : () => { return new SettingConverter(this.getInstance('client')); },
+
+            'model.password'   : Password,
+            'model.folder'     : Folder,
+            'model.tag'        : Tag,
+            'model.server'     : Server,
+            'model.session'    : Session,
+            'model.dataField'  : DataField,
+            'model.emailField' : EmailField,
+            'model.fileField'  : FileField,
+            'model.secretField': SecretField,
+            'model.textField'  : TextField,
+            'model.urlField'   : UrlField,
+            'model.setting'    : Setting,
+
+            'network.request' : ApiRequest,
+            'network.response': ApiResponse,
+
+            'authorization.session': () => { return new SessionAuthorization(this.getInstance('client')); },
+
+            'challenge.pwdv1': PWDv1Challenge,
+
+            'token.user'   : UserToken,
+            'token.request': RequestToken,
+
+            'encryption.none' : NoEncryption,
+            'encryption.csev1': () => { return new CSEv1Encryption(this.getInstance('classes')); },
+            'encryption.expv1': () => { return new ExportV1Encryption(this.getInstance('classes')); },
+
+            'keychain.csev1': CSEv1Keychain,
+
+            'service.model'   : () => { return new ModelService(this.getInstance('classes')); },
+            'service.password': () => { return new PasswordService(this.getInstance('client')); },
+
+            'cache.cache': Cache,
+
+            'state.boolean': BooleanState,
+
+            'event.event': EventEmitter,
+
+            'exception.response.contenttype'  : ResponseContentTypeError,
+            'exception.response.decoding'     : ResponseDecodingError,
+            'exception.model.property'        : UnknownPropertyError,
+            'exception.auth.challenge'        : ChallengeTypeNotSupported,
+            'exception.auth.token'            : TokenTypeNotSupported,
+            'exception.network'               : NetworkError,
+            'exception.http'                  : HttpError,
+            'exception.http.400'              : BadRequestError,
+            'exception.http.401'              : UnauthorizedError,
+            'exception.http.403'              : ForbiddenError,
+            'exception.http.404'              : NotFoundError,
+            'exception.http.405'              : MethodNotAllowedError,
+            'exception.http.429'              : TooManyRequestsError,
+            'exception.http.500'              : InternalServerError,
+            'exception.http.502'              : BadGatewayError,
+            'exception.http.503'              : ServiceUnavailableError,
+            'exception.http.504'              : GatewayTimeoutError,
+            'exception.encryption.unsupported': UnsupportedEncryptionTypeError,
+            'exception.encryption.object'     : InvalidObjectTypeError,
+            'exception.encryption.enabled'    : EncryptionNotEnabledError,
+            'exception.configuration'         : ConfigurationError,
+
+
+            // Old deprecated errors
+            'exception.contenttype': ResponseContentTypeError,
+            'exception.decoding'   : ResponseDecodingError,
+            'exception.property'   : UnknownPropertyError,
+            'exception.challenge'  : TokenTypeNotSupported,
+            'exception.token'      : TokenTypeNotSupported,
+            'exception.400'        : BadRequestError,
+            'exception.401'        : UnauthorizedError,
+            'exception.403'        : ForbiddenError,
+            'exception.404'        : NotFoundError,
+            'exception.405'        : MethodNotAllowedError,
+            'exception.429'        : TooManyRequestsError,
+            'exception.500'        : InternalServerError,
+            'exception.502'        : BadGatewayError,
+            'exception.503'        : ServiceUnavailableError,
+            'exception.504'        : GatewayTimeoutError
         };
-    }
+    };
 }

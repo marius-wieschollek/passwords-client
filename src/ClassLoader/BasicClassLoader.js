@@ -43,13 +43,11 @@ export default class BasicClassLoader {
      * @return {Object}
      */
     getClass(name, ...properties) {
-        let path = name.split('.');
-
-        if(!this._classes.hasOwnProperty(path[0]) || !this._classes[path[0]].hasOwnProperty(path[1])) {
+        if(!this._classes.hasOwnProperty(name)) {
             throw new Error(`The class ${name} does not exist`);
         }
 
-        let creator = this._classes[path[0]][path[1]];
+        let creator = this._classes[name];
         if(creator instanceof Function) {
             if(!creator.prototype || creator.hasOwnProperty('arguments') && creator.hasOwnProperty('caller')) {
                 return creator(...properties);
@@ -69,17 +67,7 @@ export default class BasicClassLoader {
      * @api
      */
     registerClass(name, constructor) {
-        let path = name.split('.');
-
-        if(!this._classes.hasOwnProperty(path[0])) {
-            this._classes[path[0]] = {};
-        }
-
-        if(!this._classes[path[0]].hasOwnProperty(path[1])) {
-            this._classes[path[1]] = {};
-        }
-
-        this._classes[path[0]][path[1]] = constructor;
+        this._classes[name] = constructor;
 
         return this;
     }

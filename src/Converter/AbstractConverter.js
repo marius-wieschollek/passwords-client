@@ -76,7 +76,7 @@ export default class AbstractConverter {
             if(data.cseType === 'CSEv1r1') {
                 data = await this._api.getCseV1Encryption().decrypt(data, this._type);
             } else if(data.cseType !== 'none') {
-                throw this._api.getClass('exception.encryption', data.id, data.cseType);
+                throw this._api.getClass('exception.encryption.unsupported', data, 'CSEv1r1');
             }
         }
 
