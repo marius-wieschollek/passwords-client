@@ -1,14 +1,13 @@
-import CSEv1Keychain from '../Encryption/Keychain/CSEv1Keychain';
 import AbstractToken from './Token/AbstractToken';
 
 export default class SessionAuthorization {
 
     /**
      *
-     * @param {BasicPasswordsClient} api
+     * @param {BasicPasswordsClient} client
      */
-    constructor(api) {
-        this._api = api;
+    constructor(client) {
+        this._client = client;
         this._challenge = null;
         this._activeToken = null;
         this._tokens = [];
@@ -29,7 +28,7 @@ export default class SessionAuthorization {
     async load() {
         if(this._loaded) return;
         this._loaded = true;
-        let response = await this._api.getRequest()
+        let response = await this._client.getRequest()
             .setPath('1.0/session/request')
             .send();
 
@@ -140,15 +139,15 @@ export default class SessionAuthorization {
             data.token[token.getId()] = token.getToken();
         }
 
-        let request = await this._api.getRequest()
+        let request = await this._client.getRequest()
             .setPath('1.0/session/open')
             .setData(data);
 
         let response = await request.send();
         if(response.getData().success) {
             if(this.requiresChallenge()) {
-                let keychain = new CSEv1Keychain(response.getData().keys.CSEv1r1, this._challenge.getPassword());
-                this._api.getCseV1Encryption().setKeychain(keychain);
+                let keychain = this._client.getClass('keychain.csev1', response.getData().keys.CSEv1r1, this._challenge.getPassword());
+                this._client.getCseV1Encryption().setKeychain(keychain);
             }
             request.getSession().setAuthorized(true);
         }
@@ -161,9 +160,9 @@ export default class SessionAuthorization {
      */
     _createChallenge(challenge) {
         if(challenge.type === 'PWDv1r1') {
-            this._challenge = this._api.getClass('challenge.pwdv1', challenge);
+            this._challenge = this._client.getClass('challenge.pwdv1', challenge);
         } else {
-            throw new this._api.getClass('exception.challenge');
+            throw new this._client.getClass('exception.challenge');
         }
     }
 
@@ -177,17 +176,17 @@ export default class SessionAuthorization {
 
         for(let token of tokens) {
             if(token.type === 'user-token') {
-                let model = this._api.getClass('token.user', this._api, token.id, token.label, token.description, token.request);
+                let model = this._client.getClass('token.user', this._client, token.id, token.label, token.description, token.request);
                 this._tokens.push(model);
             }
             if(token.type === 'request-token') {
-                let model = this._api.getClass('token.request', this._api, token.id, token.label, token.description, token.request);
+                let model = this._client.getClass('token.request', this._client, token.id, token.label, token.description, token.request);
                 this._tokens.push(model);
             }
         }
 
         if(this._tokens.length === 0 && tokens.length !== 0) {
-            throw new this._api.getClass('exception.token');
+            throw new this._client.getClass('exception.token');
         }
     }
 }
