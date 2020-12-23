@@ -1,3 +1,16 @@
 export default class InvalidLink extends Error {
-    constructor(action) {super(`Unknown action ${action}`);}
+
+    /**
+     * @returns {String}
+     */
+    get name() {
+        return 'InvalidLink';
+    }
+
+    /**
+     * @param {String} action
+     */
+    constructor(action) {
+        super(`Unknown PassLink action ${action}`);
+    }
 }

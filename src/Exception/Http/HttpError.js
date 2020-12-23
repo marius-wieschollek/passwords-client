@@ -1,9 +1,22 @@
 export default class HttpError extends Error {
 
+    /**
+     * @returns {String}
+     */
+    get name() {
+        return 'HttpError';
+    }
+
+    /**
+     * @returns {Response}
+     */
     get response() {
         return this._response;
     }
 
+    /**
+     * @returns {Number}
+     */
     get status() {
         return this._status;
     }

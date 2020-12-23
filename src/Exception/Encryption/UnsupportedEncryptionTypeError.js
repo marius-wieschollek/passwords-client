@@ -3,6 +3,13 @@ export default class UnsupportedEncryptionTypeError extends Error {
     /**
      * @returns {String}
      */
+    get name() {
+        return 'UnsupportedEncryptionTypeError';
+    }
+
+    /**
+     * @returns {String}
+     */
     get supportedTypes() {
         return this._supportedTypes;
     }
@@ -14,6 +21,10 @@ export default class UnsupportedEncryptionTypeError extends Error {
         return this._object;
     }
 
+    /**
+     * @param {Object} object
+     * @param {(String|String[])} supportedTypes
+     */
     constructor(object, supportedTypes) {
         if(Array.isArray(supportedTypes)) {
             supportedTypes = supportedTypes.join(', ');

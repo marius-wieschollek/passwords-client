@@ -1,4 +1,11 @@
-export default class TokenTypeNotSupported extends Error{
+export default class TokenTypeNotSupported extends Error {
+
+    /**
+     * @returns {String}
+     */
+    get name() {
+        return 'TokenTypeNotSupported';
+    }
 
     /**
      *

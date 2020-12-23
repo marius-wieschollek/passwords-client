@@ -1,6 +1,13 @@
 export default class ChallengeTypeNotSupported extends Error {
 
     /**
+     * @returns {String}
+     */
+    get name() {
+        return 'ChallengeTypeNotSupported';
+    }
+
+    /**
      *
      */
     constructor() {

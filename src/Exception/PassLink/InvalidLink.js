@@ -1,3 +1,13 @@
 export default class InvalidLink extends Error {
-    constructor() {super('Not a valid passlink');}
+
+    /**
+     * @returns {String}
+     */
+    get name() {
+        return 'InvalidLink';
+    }
+
+    constructor() {
+        super('Invalid PassLink given');
+    }
 }
