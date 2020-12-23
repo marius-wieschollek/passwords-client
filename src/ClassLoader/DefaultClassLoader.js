@@ -61,6 +61,8 @@ import InvalidObjectTypeError from "../Exception/Encryption/InvalidObjectTypeErr
 import EncryptionNotEnabledError from "../Exception/Encryption/EncryptionNotEnabledError";
 import ChallengeTypeNotSupported from "../Exception/ChallengeTypeNotSupported";
 import ConfigurationError from "../Exception/ConfigruationError";
+import MissingEncryptionKeyError from "../Exception/Encryption/MissingEncryptionKeyError";
+import InvalidEncryptedTextLength from "../Exception/Encryption/InvalidEncryptedTextLength";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -111,11 +113,11 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'token.user'   : UserToken,
             'token.request': RequestToken,
 
-            'encryption.none' : NoEncryption,
+            'encryption.none' : () => { return new NoEncryption(this.getInstance('classes')); },
             'encryption.csev1': () => { return new CSEv1Encryption(this.getInstance('classes')); },
             'encryption.expv1': () => { return new ExportV1Encryption(this.getInstance('classes')); },
 
-            'keychain.csev1': CSEv1Keychain,
+            'keychain.csev1': (k, p) => { return new CSEv1Keychain(this.getInstance('classes'), k, p); },
 
             'service.model'   : () => { return new ModelService(this.getInstance('classes')); },
             'service.password': () => { return new PasswordService(this.getInstance('client')); },
@@ -146,6 +148,8 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'exception.encryption.unsupported': UnsupportedEncryptionTypeError,
             'exception.encryption.object'     : InvalidObjectTypeError,
             'exception.encryption.enabled'    : EncryptionNotEnabledError,
+            'exception.encryption.key.missing': MissingEncryptionKeyError,
+            'exception.encryption.text.length': InvalidEncryptedTextLength,
             'exception.configuration'         : ConfigurationError,
 
 

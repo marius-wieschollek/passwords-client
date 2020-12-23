@@ -4,11 +4,18 @@ import BooleanState from '../../State/BooleanState';
 
 export default class CSEv1Keychain {
 
-    constructor(keychain = null, password = null) {
+    /**
+     *
+     * @param {BasicClassLoader} classLoader
+     * @param {String} keychain
+     * @param {String} password
+     */
+    constructor(classLoader, keychain = null, password = null) {
         this._keys = {};
         this._current = null;
-        this._enabled = new BooleanState(false);
+        this._enabled = classLoader.getClass('state.boolean', false);
         this._password = password;
+        this._classLoader = classLoader;
 
         if(keychain !== null) {
             sodium.ready.then(() => {
@@ -47,8 +54,7 @@ export default class CSEv1Keychain {
             return this._keys[id];
         }
 
-        // TODO custom error here
-        throw new Error('Unknown CSE key id');
+        throw this._classLoader.getClass('exception.encryption.key.missing', id);
     }
 
     /**
@@ -154,7 +160,8 @@ export default class CSEv1Keychain {
      * @returns {Uint8Array}
      */
     _decrypt(encrypted, key) {
-        if(encrypted.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) throw new Error('Invalid encrypted text length');
+        let expectedLength = sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES;
+        if(encrypted.length < expectedLength) throw this._classLoader.getClass('exception.encryption.text.length', encrypted.length, expectedLength);
 
         let nonce      = encrypted.slice(0, sodium.crypto_secretbox_NONCEBYTES),
             ciphertext = encrypted.slice(sodium.crypto_secretbox_NONCEBYTES);
