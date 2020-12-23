@@ -29,7 +29,6 @@ export default class CSEv1Encryption {
     }
 
     /**
-     *
      * @returns {Boolean}
      */
     enabled() {

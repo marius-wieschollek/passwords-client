@@ -1,7 +1,13 @@
 export default class NoEncryption {
 
     /**
-     *
+     * @param {BasicClassLoader} classLoader
+     */
+    constructor(classLoader) {
+        this._classLoader = classLoader;
+    }
+
+    /**
      * @returns {Promise<Boolean>}
      */
     async ready() {
@@ -9,10 +15,9 @@ export default class NoEncryption {
     }
 
     /**
-     *
      * @returns {Boolean}
      */
-    async enabled() {
+    enabled() {
         return true;
     }
 
@@ -37,7 +42,7 @@ export default class NoEncryption {
      * @returns {Object}
      */
     async decrypt(object, type) {
-        if(object.cseType !== 'none') throw new Error('Unsupported encryption type');
+        if(object.cseType !== 'none') throw this._classLoader.getClass('exception.encryption.unsupported', object, 'none');
         return object;
     }
 }
