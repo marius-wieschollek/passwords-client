@@ -136,7 +136,7 @@ export default class EnhancedApi extends SimpleApi {
 
         let result = await super.setAccountChallenge(challenge.secret, challenge.salts, oldSecret);
         if(result.success) {
-            let keychain = this.config.encryption.getKeychain(password);
+            let keychain = this.config.encryption.getKeychain(password, true);
             await super.setKeychain('CSEv1r1', keychain);
         }
 
