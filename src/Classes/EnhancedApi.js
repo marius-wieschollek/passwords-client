@@ -1,3 +1,4 @@
+import Url from 'url-parse';
 import SimpleApi from './SimpleApi';
 import Encryption from './Encryption';
 import EventEmitter from 'eventemitter3';
@@ -1354,5 +1355,23 @@ export default class EnhancedApi extends SimpleApi {
                 default: false
             }
         };
+    }
+
+    // noinspection JSMethodCanBeStatic
+    /**
+     *
+     * @param url
+     * @param component
+     * @returns {*}
+     */
+    parseUrl(url, component = null) {
+        if(url === undefined) return null;
+
+        if(url.indexOf('://') === -1) url = `http://${url}`;
+
+        let link = Url(url);
+        if(component !== null) return link[component];
+
+        return link;
     }
 }

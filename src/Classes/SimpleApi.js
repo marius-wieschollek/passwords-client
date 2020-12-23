@@ -902,26 +902,6 @@ export default class SimpleApi {
     /**
      *
      * @param url
-     * @param component
-     * @returns {*}
-     */
-    parseUrl(url, component = null) {
-        if(url === undefined) return null;
-        let link = document.createElement('a');
-
-        if(url.indexOf('://') === -1) url = `http://${url}`;
-
-        link.setAttribute('href', url);
-
-        if(component !== null) return link[component];
-
-        return link;
-    }
-
-    // noinspection JSMethodCanBeStatic
-    /**
-     *
-     * @param url
      * @param data
      * @returns {*}
      */
