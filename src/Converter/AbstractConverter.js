@@ -89,7 +89,7 @@ export default class AbstractConverter {
      * @api
      */
     async toEncryptedData(model) {
-        let data = this.toObject(model);
+        let data = await this.toObject(model);
 
         if(data.cseType === 'none') {
             return await this._api.getInstance('encryption.none').encrypt(data, this._type);

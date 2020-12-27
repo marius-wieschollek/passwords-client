@@ -49,11 +49,10 @@ export default class CSEv1Encryption {
         let fields = this.fields[type],
             key    = this._keychain.getCurrentKey();
 
-        for(let i = 0; i < fields.length; i++) {
-            let field = fields[i],
-                data  = object[field];
+        for(let field of fields) {
+            let data  = object[field];
 
-            if(data === null || data.length === 0) continue;
+            if(data === null || data === undefined || data.length === 0) continue;
             object[field] = this._encryptString(data, key);
         }
 
@@ -78,9 +77,8 @@ export default class CSEv1Encryption {
         let fields = this.fields[type],
             key    = this._keychain.getKey(object.cseKey);
 
-        for(let i = 0; i < fields.length; i++) {
-            let field = fields[i],
-                data  = object[field];
+        for(let field of fields) {
+            let data  = object[field];
 
             if(data === null || data.length === 0) continue;
             object[field] = this._decryptString(data, key);

@@ -138,7 +138,7 @@ export default class AbstractCollection {
     }
 
     /**
-     * @return {String[]}
+     * @return {Object}
      */
     toJSON() {
         let json = [];
@@ -147,7 +147,7 @@ export default class AbstractCollection {
             json.push(this._converter.toObject(element));
         }
 
-        return JSON.stringify(json);
+        return json;
     }
 
     [Symbol.iterator]() {

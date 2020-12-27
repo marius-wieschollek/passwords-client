@@ -8,8 +8,9 @@ export default class PasswordConverter extends AbstractConverter {
      */
     constructor(api) {
         super(api, 'password');
-        /** @type CustomFieldConverter **/
+        /** @type {CustomFieldConverter} **/
         this._customFieldConverter = this._api.getInstance('converter.field');
+        this._hashService = /** @type {HashService} **/ this._api.getInstance('service.hash');
     }
 
     /**
@@ -36,5 +37,19 @@ export default class PasswordConverter extends AbstractConverter {
         }
 
         return this._api.getClass(`model.${this._type}`, clone, this._api);
+    }
+
+    /**
+     *
+     * @param {(Password|AbstractRevisionModel)} model
+     * @returns {Promise<void>}
+     */
+    async toObject(model) {
+        let data = super.toObject(model);
+
+        data.customFields = this._customFieldConverter.toJSON(model.getCustomFields());
+        data.hash = await this._hashService.getHash(model.getPassword(), this._hashService.HASH_SHA_1);
+
+        return data;
     }
 }

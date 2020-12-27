@@ -22,6 +22,7 @@ export default class ModelService {
 
     addModel(type, model) {
         this._cache.set(`${type}.${model.getId()}`, model);
+        this._cache.set(`${type}.${model.getId()}.${model.getRevision()}`, model);
         // @TODO update related models
     }
 
@@ -254,7 +255,6 @@ export default class ModelService {
     _mergeStandardProperties(model, newModel, excludeProperties) {
         if(model.getRevision() === newModel.getRevision()) {
             model.setUpdated(newModel.getUpdated());
-            return;
         }
 
         excludeProperties.push('id, revisions')
