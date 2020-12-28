@@ -92,6 +92,17 @@ export default class ApiRequest {
     /**
      *
      * @param {String} value
+     * @returns {ApiRequest}
+     */
+    setResponseType(value) {
+        this._responseType = value;
+
+        return this;
+    }
+
+    /**
+     *
+     * @param {String} value
      * @return {ApiRequest}
      */
     setUserAgent(value) {
@@ -107,7 +118,6 @@ export default class ApiRequest {
     async send() {
         let options = this._getRequestOptions();
         let httpResponse = await this._executeRequest(this._url + this._path, options);
-        let expectedContentType = options.headers.get('content-type');
         let contentType = httpResponse.headers.get('content-type');
 
         let response = new ApiResponse()
@@ -118,8 +128,8 @@ export default class ApiRequest {
 
         this._session.setId(httpResponse.headers.get('x-api-session'));
 
-        if(expectedContentType !== null && contentType && contentType.indexOf(expectedContentType) === -1) {
-            let error = this._api.getClass('exception.contenttype', expectedContentType, contentType, httpResponse);
+        if(this._responseType !== null && contentType && contentType.indexOf(this._responseType) === -1) {
+            let error = this._api.getClass('exception.contenttype', this._responseType, contentType, httpResponse);
             this._api.emit('request.error', error);
             throw error;
         } else if(contentType && contentType.indexOf('application/json') !== -1) {
