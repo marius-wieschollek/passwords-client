@@ -87,7 +87,7 @@ export default class EnhancedPassword extends Password {
      * @returns {Promise<Blob>}
      */
     async getPreview(width = 640, height = '360...', view) {
-        let path = this.getPreviewUrl(size, true),
+        let path = this.getPreviewUrl(width, height, view, true),
             response = await this._api.getRequest().setPath(path).setResponseType('image/jpeg').send();
 
         return response.getData();
