@@ -1,10 +1,10 @@
 export default class CustomFieldConverter {
 
     /**
-     * @param {BasicPasswordsClient} api
+     * @param {BasicPasswordsClient} client
      */
-    constructor(api) {
-        this._api = api;
+    constructor(client) {
+        this._client = client;
     }
 
     /**
@@ -31,9 +31,14 @@ export default class CustomFieldConverter {
      * @api
      */
     fromObject(object) {
+        if(!object.hasOwnProperty('type') || object.type === null) {
+            this._client.getLogger().warning('Ignoring invalid custom field data', {field: object});
+            this._client.getClass(`model.defectField`, {label:'##ERROR##', value:JSON.stringify(object)})
+        }
+
         let type = object.type;
 
-        return this._api.getClass(`model.${type}Field`, object);
+        return this._client.getClass(`model.${type}Field`, object);
     }
 
     /**
@@ -48,7 +53,7 @@ export default class CustomFieldConverter {
             fields.push(this.fromObject(field));
         }
 
-        return this._api.getClass('collection.field', fields);
+        return this._client.getClass('collection.field', fields);
     }
 
     /**

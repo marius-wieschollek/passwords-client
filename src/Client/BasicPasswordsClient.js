@@ -66,6 +66,13 @@ export default class BasicPasswordsClient {
     }
 
     /**
+     * @returns {Logger}
+     */
+    getLogger() {
+        return this._classes.getInstance('logger');
+    }
+
+    /**
      * @returns {Boolean}
      */
     isAuthorized() {

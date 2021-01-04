@@ -3,7 +3,7 @@ import ObjectMerger from "../Utility/ObjectMerger";
 export default class BasicClassLoader {
 
     constructor(classes = {}) {
-        this._classes = ObjectMerger.merge(this._getDefaultClasses(), classes);
+        this._classes = Object.assign(this._getDefaultClasses(), classes);
         this._instances = {};
     }
 

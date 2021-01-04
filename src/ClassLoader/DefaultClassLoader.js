@@ -64,6 +64,8 @@ import ConfigurationError from "../Exception/ConfigruationError";
 import MissingEncryptionKeyError from "../Exception/Encryption/MissingEncryptionKeyError";
 import InvalidEncryptedTextLength from "../Exception/Encryption/InvalidEncryptedTextLength";
 import HashService from "../Services/HashService";
+import Logger from "../Logger/Logger";
+import DefectField from "../Model/CustomField/DefectField";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -102,6 +104,7 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'model.secretField': SecretField,
             'model.textField'  : TextField,
             'model.urlField'   : UrlField,
+            'model.defectField': DefectField,
             'model.setting'    : Setting,
 
             'network.request' : ApiRequest,
@@ -120,9 +123,11 @@ export default class DefaultClassLoader extends BasicClassLoader {
 
             'keychain.csev1': (k, p) => { return new CSEv1Keychain(this.getInstance('classes'), k, p); },
 
-            'service.hash'   : () => { return new HashService(this.getInstance('classes')); },
+            'service.hash'    : () => { return new HashService(this.getInstance('classes')); },
             'service.model'   : () => { return new ModelService(this.getInstance('classes')); },
             'service.password': () => { return new PasswordService(this.getInstance('client')); },
+
+            'logger': Logger,
 
             'cache.cache': Cache,
 
