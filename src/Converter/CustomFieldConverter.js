@@ -32,7 +32,7 @@ export default class CustomFieldConverter {
      */
     fromObject(object) {
         if(!object.hasOwnProperty('type') || object.type === null || object.type === undefined) {
-            this._client.getLogger().warning('Ignoring invalid custom field data', {field: object});
+            this._client.getLogger().error('Found invalid custom field', {field: object});
             this._client.getClass(`model.defectField`, {label:'##ERROR##', value:JSON.stringify(object)})
         }
 
