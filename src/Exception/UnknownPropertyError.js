@@ -26,7 +26,7 @@ export default class UnknownPropertyError extends Error {
      * @param {String} item
      */
     constructor(property, item) {
-        super(`Read access to unknown property ${property}`);
+        super(`Attempted access to unknown property ${property}`);
 
         this._property = property;
         this._item = item;
