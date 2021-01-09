@@ -7,7 +7,7 @@ export default class AbstractConverter {
      * @param {String} type
      */
     constructor(api, type) {
-        this._api = api;
+        this._client = api;
         this._type = type;
     }
 
@@ -63,7 +63,7 @@ export default class AbstractConverter {
      * @return {*}
      */
     makeModel(properties) {
-        return this._api.getClass(`model.${this._type}`, properties, this._api);
+        return this._client.getClass(`model.${this._type}`, properties);
     }
 
     /**
@@ -74,9 +74,9 @@ export default class AbstractConverter {
     async fromEncryptedData(data) {
         if(data.hasOwnProperty('cseType')) {
             if(data.cseType === 'CSEv1r1') {
-                data = await this._api.getCseV1Encryption().decrypt(data, this._type);
+                data = await this._client.getCseV1Encryption().decrypt(data, this._type);
             } else if(data.cseType !== 'none') {
-                throw this._api.getClass('exception.encryption.unsupported', data, 'CSEv1r1');
+                throw this._client.getClass('exception.encryption.unsupported', data, 'CSEv1r1');
             }
         }
 
@@ -92,14 +92,14 @@ export default class AbstractConverter {
         let data = await this.toObject(model);
 
         if(data.cseType === 'none') {
-            return await this._api.getInstance('encryption.none').encrypt(data, this._type);
+            return await this._client.getInstance('encryption.none').encrypt(data, this._type);
         }
 
         if(data.cseType === 'CSEv1r1') {
-            return await this._api.getCseV1Encryption().encrypt(data, this._type);
+            return await this._client.getCseV1Encryption().encrypt(data, this._type);
         }
 
-        return await this._api.getDefaultEncryption().encrypt(data, this._type);
+        return await this._client.getDefaultEncryption().encrypt(data, this._type);
     }
 
     /**
