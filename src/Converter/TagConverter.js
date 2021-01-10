@@ -3,9 +3,9 @@ import AbstractConverter from './AbstractConverter';
 export default class TagConverter extends AbstractConverter {
 
     /**
-     * @param {BasicPasswordsClient} api
+     * @param {BasicPasswordsClient} client
      */
-    constructor(api) {
-        super(api, 'tag');
+    constructor(client) {
+        super(client, 'tag');
     }
 }

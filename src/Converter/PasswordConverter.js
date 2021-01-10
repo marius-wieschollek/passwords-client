@@ -4,13 +4,13 @@ import ObjectClone from '../Utility/ObjectClone';
 export default class PasswordConverter extends AbstractConverter {
 
     /**
-     * @param {BasicPasswordsClient} api
+     * @param {BasicPasswordsClient} client
      */
-    constructor(api) {
-        super(api, 'password');
+    constructor(client) {
+        super(client, 'password');
         /** @type {CustomFieldConverter} **/
-        this._customFieldConverter = this._api.getInstance('converter.field');
-        this._hashService = /** @type {HashService} **/ this._api.getInstance('service.hash');
+        this._customFieldConverter = this._client.getInstance('converter.field');
+        this._hashService = /** @type {HashService} **/ this._client.getInstance('service.hash');
     }
 
     /**
@@ -42,7 +42,7 @@ export default class PasswordConverter extends AbstractConverter {
             clone.edited = new Date(clone.edited * 1e3);
         }
 
-        return this._api.getClass(`model.${this._type}`, clone, this._api);
+        return this._client.getClass(`model.${this._type}`, clone);
     }
 
     /**

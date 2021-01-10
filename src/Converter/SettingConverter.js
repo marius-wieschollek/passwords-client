@@ -3,10 +3,10 @@ export default class SettingConverter {
     /**
      * @param {BasicPasswordsClient} api
      */
-    constructor(api) {
-        this._api = api;
+    constructor(client) {
+        this._client = client;
         /** @type {Cache} **/
-        this._cache = api.getInstance('cache.cache');
+        this._cache = client.getInstance('cache.cache');
     }
 
     /**
@@ -40,7 +40,7 @@ export default class SettingConverter {
             return setting;
         }
 
-        let setting = this._api.getClass('model.setting', object.name, object.value, object.scope);
+        let setting = this._client.getClass('model.setting', object.name, object.value, object.scope);
         this._cache.set(key, setting, 'setting.model');
 
         return setting;
@@ -58,7 +58,7 @@ export default class SettingConverter {
             settings.push(this.fromObject(setting));
         }
 
-        return this._api.getClass('collection.setting', settings);
+        return this._client.getClass('collection.setting', settings);
     }
 
     /**
@@ -79,7 +79,7 @@ export default class SettingConverter {
             settings.push(this.fromObject({scope, name, value}));
         }
 
-        return this._api.getClass('collection.setting', settings);
+        return this._client.getClass('collection.setting', settings);
     }
 
     /**
