@@ -1,23 +1,23 @@
 {
-    "name"        : "passwords-client",
+    "name": "passwords-client",
     "version": "0.0.11",
-    "description" : "JS client library for the Nextcloud Passwords app",
-    "main"        : "src/main.js",
-    "author"      : "Marius Wieschollek",
-    "license"     : "ISC",
-    "keywords"    : [
+    "description": "JS client library for the Nextcloud Passwords app",
+    "main": "src/main.js",
+    "author": "Marius Wieschollek",
+    "license": "ISC",
+    "keywords": [
         "crypto",
         "passwords",
         "api",
         "nextcloud"
     ],
-    "repository"  : {
+    "repository": {
         "type": "git",
-        "url" : "https://git.mdns.eu/nextcloud/passwords-client.git"
+        "url": "https://git.mdns.eu/nextcloud/passwords-client.git"
     },
     "dependencies": {
-        "url-parse"         : "^1.4.7",
-        "eventemitter3"     : "^3.1.2",
+        "url-parse": "^1.4.7",
+        "eventemitter3": "^3.1.2",
         "libsodium-wrappers": "^0.7.8"
     }
 }
