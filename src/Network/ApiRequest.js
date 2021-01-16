@@ -126,7 +126,7 @@ export default class ApiRequest {
             .setHttpStatus(httpResponse.status)
             .setHttpResponse(httpResponse);
 
-        this._session.setId(httpResponse.headers.get('x-api-session'));
+        this._updateSessionId(httpResponse);
 
         if(this._responseType !== null && contentType && contentType.indexOf(this._responseType) === -1) {
             let error = this._api.getClass('exception.contenttype', this._responseType, contentType, httpResponse);
@@ -141,6 +141,26 @@ export default class ApiRequest {
         this._api.emit('request.after', response);
 
         return response;
+    }
+
+    /**
+     *
+     * @param httpResponse
+     * @private
+     */
+    _updateSessionId(httpResponse) {
+        if(httpResponse.headers.has('x-api-session')) {
+            if(httpResponse.headers.has('cache-control') && httpResponse.headers.get('cache-control').indexOf('immutable') !== -1) return;
+            if(httpResponse.headers.has('pragma') && httpResponse.headers.get('pragma') === 'cache') return;
+
+            if(httpResponse.headers.has('date')) {
+                let date = new Date(httpResponse.headers.get('date')),
+                    now  = Date.now() - 300000;
+                if(date.getTime() < now) return;
+            }
+
+            this._session.setId(httpResponse.headers.get('x-api-session'));
+        }
     }
 
     /**

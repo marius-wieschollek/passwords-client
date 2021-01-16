@@ -21,6 +21,7 @@ export default class Session {
      */
     setId(value) {
         this._id = value;
+        this._authorized = false;
 
         return this;
     }
