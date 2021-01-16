@@ -20,8 +20,10 @@ export default class Session {
      * @return {Session}
      */
     setId(value) {
-        this._id = value;
-        this._authorized = false;
+        if(this._id !== value) {
+            this._authorized = false;
+            this._id = value;
+        }
 
         return this;
     }
