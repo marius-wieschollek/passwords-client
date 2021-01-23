@@ -668,8 +668,12 @@ export default class SimpleApi {
      *
      * @returns {Promise}
      */
-    resetUserAccount(password) {
-        return this._sendRequest('account.reset', {password});
+    resetUserAccount(code = null) {
+        if(code === null) {
+            return this._sendRequest('account.reset');
+        }
+
+        return this._sendRequest('account.reset', {code});
     }
 
 
