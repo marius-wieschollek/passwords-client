@@ -4,10 +4,13 @@ import HttpRequest from '../../Network/HttpRequest';
 export default class Connect extends PassLinkAction {
 
     /**
-     *
      * @param {Object} parameters
      */
     constructor(parameters) {
+        if(!parameters.hasOwnProperty('id') && parameters.path.length > 8) {
+            parameters.id = parameters.path.substr(8, 36);
+        }
+
         super(parameters);
         this._codes = null;
         this._clientLabel = null;
@@ -109,13 +112,31 @@ export default class Connect extends PassLinkAction {
      * @private
      */
     async _decodeTheme() {
-        if(!this._parameters.hasOwnProperty('theme')) return null;
+        if(this._parameters.hasOwnProperty('t')) {
+            let pako   = await import(/* webpackChunkName: "pako" */ 'pako'),
+                base64 = this._parameters.t,
+                zipped = atob(base64),
+                data   = pako.inflate(zipped, {to: 'string'});
 
-        let pako   = await import(/* webpackChunkName: "pako" */ 'pako'),
-            base64 = this._parameters.theme,
-            zipped = atob(base64),
-            json   = pako.inflate(zipped, {to: 'string'}),
-            theme  = JSON.parse(json);
+            return this._themeFromV1(data);
+        } else if(this._parameters.hasOwnProperty('theme')) {
+            let pako   = await import(/* webpackChunkName: "pako" */ 'pako'),
+                base64 = this._parameters.theme,
+                zipped = atob(base64),
+                data   = pako.inflate(zipped, {to: 'string'});
+
+            return this._themeFromJson(data);
+        }
+        return null;
+    }
+
+    /**
+     * @param {String} data
+     * @return {Object|null}
+     * @private
+     */
+    _themeFromJson(data) {
+        let theme = JSON.parse(data);
 
         if(theme.hasOwnProperty('color')) {
             theme['color.primary'] = theme.color;
@@ -135,6 +156,29 @@ export default class Connect extends PassLinkAction {
         if(theme.hasOwnProperty('logo')) {
             theme.logo = this._parameters.baseUrl + theme.logo;
         }
+
+        this._theme = theme;
+
+        return theme;
+    }
+
+    /**
+     * @param {String} data
+     * @return {Object|null}
+     * @private
+     */
+    _themeFromV1(data) {
+        let parts = data.split('|');
+        if(parts.length !== 6) return null;
+
+        let theme = {};
+
+        theme['label'] = parts[0];
+        theme['logo'] = `${this._parameters.baseUrl}/${parts[1]}`;
+        theme['background'] = parts[2].substr(0, 3) === '://' ? `https${parts[2]}`:`${this._parameters.baseUrl}/${parts[2]}`;
+        theme['color.primary'] = parts[3].length === 6 ? '#' + parts[3]:parts[3];
+        theme['color.text'] = parts[4].length === 6 ? '#' + parts[4]:parts[4];
+        theme['color.background'] = parts[5].length === 6 ? '#' + parts[5]:parts[5];
 
         this._theme = theme;
 
