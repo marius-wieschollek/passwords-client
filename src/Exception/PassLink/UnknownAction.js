@@ -1,10 +1,10 @@
-export default class InvalidLink extends Error {
+export default class UnknownAction extends Error {
 
     /**
      * @returns {String}
      */
     get name() {
-        return 'InvalidLink';
+        return 'UnknownAction';
     }
 
     /**
