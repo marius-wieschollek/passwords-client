@@ -883,7 +883,7 @@ export default class EnhancedApi extends SimpleApi {
         if(password.customFields) {
             password.customFields = JSON.parse(password.customFields);
         } else {
-            password.customFields = {};
+            password.customFields = [];
         }
 
 
