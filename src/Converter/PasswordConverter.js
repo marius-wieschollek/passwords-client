@@ -21,8 +21,13 @@ export default class PasswordConverter extends AbstractConverter {
         let clone = ObjectClone.clone(object);
 
         if(typeof clone.customFields === 'string') {
+
             try {
-                clone.customFields = this._customFieldConverter.fromJSON(clone.customFields);
+                if(clone.customFields.length !== 0) {
+                    clone.customFields = this._customFieldConverter.fromJSON(clone.customFields);
+                } else {
+                    clone.customFields = this._customFieldConverter.fromArray([]);
+                }
             } catch(e) {
                 this._client.getLogger().warning('Could not read custom fields', {password: object});
                 this._client.getLogger().exception(e, {password: object});
