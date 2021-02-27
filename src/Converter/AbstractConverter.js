@@ -114,6 +114,10 @@ export default class AbstractConverter {
         for(let key in data) {
             if(!properties.hasOwnProperty(key) || !properties[key].writeable) {
                 delete data[key];
+                continue;
+            }
+            if(properties.hasOwnProperty(key) && properties[key].type === 'date' && data[key] instanceof Date) {
+                data[key] = Math.round(data[key].getTime() / 1000);
             }
         }
 
