@@ -1,5 +1,8 @@
-This library contains a JavaScript client for the [Passwords app for Nextcloud](https://apps.nextcloud.com/apps/passwords)
-Cou can find the API documentation [here](https://git.mdns.eu/nextcloud/passwords/wikis/developers/index)
+This is as WIP! Expect changes.
+
+This package contains a JavaScript client for the [Passwords app for Nextcloud](https://apps.nextcloud.com/apps/passwords)
+
+You can find the API documentation [here](https://git.mdns.eu/nextcloud/passwords/wikis/developers/index)
 
 ### Using the client
 You can use the enhanced version of the client in your project like this:
