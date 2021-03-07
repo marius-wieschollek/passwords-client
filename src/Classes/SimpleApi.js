@@ -551,6 +551,7 @@ export default class SimpleApi {
      * @returns {Promise}
      */
     getAvatar(user, size = 32) {
+        user = encodeURIComponent(user);
         return this._sendRequest(['service.avatar', {user, size}], null, 'GET', 'image/png');
     }
 
@@ -562,6 +563,7 @@ export default class SimpleApi {
      * @returns {*}
      */
     getAvatarUrl(user, size = 32) {
+        user = encodeURIComponent(user);
         return this._config.apiUrl + this.processUrl(this._paths['service.avatar'], {user, size});
     }
 
@@ -574,6 +576,7 @@ export default class SimpleApi {
      */
     getFavicon(domain, size = 32) {
         if(domain === null || domain.length === 0) domain = 'default';
+        domain = encodeURIComponent(domain);
         return this._sendRequest(['service.favicon', {domain, size}], null, 'GET', 'image/png');
     }
 
@@ -586,6 +589,7 @@ export default class SimpleApi {
      */
     getFaviconUrl(domain, size = 32) {
         if(domain === null || domain.length === 0) domain = 'default';
+        domain = encodeURIComponent(domain);
         return this._config.apiUrl + this.processUrl(this._paths['service.favicon'], {domain, size});
     }
 
@@ -600,6 +604,7 @@ export default class SimpleApi {
      */
     getPreview(domain, view = 'desktop', width = '640', height = '360...') {
         if(domain === null || domain.length === 0) domain = 'default';
+        domain = encodeURIComponent(domain);
         return this._sendRequest(
             ['service.preview', {domain, view, width, height}],
             null,
@@ -619,6 +624,7 @@ export default class SimpleApi {
      */
     getPreviewUrl(domain, view = 'desktop', width = '640', height = '360...') {
         if(domain === null || domain.length === 0) domain = 'default';
+        domain = encodeURIComponent(domain);
         return this._config.apiUrl + this.processUrl(
             this._paths['service.preview'],
             {domain, view, width, height}
@@ -739,13 +745,14 @@ export default class SimpleApi {
      * @param data
      * @param method
      * @param dataType
+     * @param requestOptions
      * @returns {Promise}
      * @private
      */
-    async _sendRequest(path, data = null, method = null, dataType = 'application/json') {
+    async _sendRequest(path, data = null, method = null, dataType = 'application/json', requestOptions = {}) {
         if(!this._enabled) throw new Error('API not authorized');
         let url         = this._getRequestUrl(path),
-            options     = this._getRequestOptions(method, data, dataType),
+            options     = this._getRequestOptions(method, data, dataType, requestOptions),
             response    = await this._executeRequest(url, options),
             contentType = response.headers.get('content-type');
 
@@ -767,10 +774,11 @@ export default class SimpleApi {
      * @param method
      * @param data
      * @param dataType
+     * @param requestOptions
      * @returns {{method: *, headers: Headers, credentials: string}}
      * @private
      */
-    _getRequestOptions(method, data, dataType) {
+    _getRequestOptions(method, data, dataType, requestOptions) {
         if(method === null || method === 'GET') method = data === null ? 'GET':'POST';
 
         let headers = new Headers();
@@ -784,6 +792,12 @@ export default class SimpleApi {
         if(data) {
             headers.append('Content-Type', 'application/json');
             options.body = JSON.stringify(data);
+        }
+
+        for(let key in requestOptions) {
+            if(!options.hasOwnProperty(key) && requestOptions.hasOwnProperty(key)) {
+                options[key] = requestOptions[key];
+            }
         }
 
         return options;
