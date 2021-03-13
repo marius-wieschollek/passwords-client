@@ -112,6 +112,7 @@ export default class AbstractRepository {
      */
     async delete(model) {
         let request = this._api.getRequest()
+                          .setMethod('DELETE')
                           .setPath(`1.0/${this.TYPE}/delete`)
                           .setData({id: model.getId(), revision: model.getRevision()});
 
@@ -140,6 +141,7 @@ export default class AbstractRepository {
         if(!model.getTrashed()) return model;
 
         let request = this._api.getRequest()
+                          .setMethod('PATCH')
                           .setPath(`1.0/${this.TYPE}/restore`)
                           .setData({id: model.getId(), revision: model.getRevision()});
 
