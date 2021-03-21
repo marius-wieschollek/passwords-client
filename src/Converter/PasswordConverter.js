@@ -34,7 +34,7 @@ export default class PasswordConverter extends AbstractConverter {
                 clone.customFields = this._customFieldConverter.fromArray([]);
             }
         } else {
-            if(Array.isArray(clone.customFields) !== undefined && clone.customFields.length > 0) {
+            if(Array.isArray(clone.customFields) && clone.customFields.length > 0) {
                 clone.customFields = this._customFieldConverter.fromArray(clone.customFields);
             } else {
                 clone.customFields = this._customFieldConverter.fromArray([]);
