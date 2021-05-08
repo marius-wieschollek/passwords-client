@@ -100,7 +100,7 @@ export default class Password extends AbstractRevisionModel {
 
     /**
      * @param {CustomFieldCollection} value
-     * @return {AbstractModel}
+     * @return {Password}
      */
     setCustomFields(value) {
         return this.setProperty('customFields', value);
