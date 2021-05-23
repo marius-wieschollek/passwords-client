@@ -1,12 +1,12 @@
 {
     "name": "passwords-client",
-    "version": "0.1.0",
+    "version": "1.0.0.BUILD",
     "description": "JS client library for the Nextcloud Passwords app",
     "main": "src/main.js",
     "author": "Marius Wieschollek",
     "license": "ISC",
     "keywords": [
-        "crypto",
+        "libsodium",
         "passwords",
         "api",
         "nextcloud"
