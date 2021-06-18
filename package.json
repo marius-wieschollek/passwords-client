@@ -1,7 +1,7 @@
 {
     "name": "passwords-client",
-    "version": "0.0.12",
-    "description": "JS client library for the Nextcloud Passwords app",
+    "version": "0.0.13",
+    "description": "JS client library for the Passwords app for Nextcloud",
     "main": "src/main.js",
     "author": "Marius Wieschollek",
     "license": "ISC",
@@ -17,7 +17,7 @@
     },
     "dependencies": {
         "eventemitter3": "^3.1.2",
-        "libsodium-wrappers": "^0.7.8",
-        "url-parse": "^1.4.7"
+        "libsodium-wrappers": "^0.7.9",
+        "url-parse": "^1.5.1"
     }
 }

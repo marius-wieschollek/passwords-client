@@ -43,6 +43,7 @@ export default class EnhancedApi extends SimpleApi {
 
         if(!config.folderIcon) config.folderIcon = `${config.baseUrl}core/img/filetypes/folder.svg`;
         if(!config.apiUrl) config.apiUrl = `${config.baseUrl}index.php/apps/passwords/`;
+        if(!config.hashLength) config.hashLength = 40;
 
         if(!config.encryption) config.encryption = new Encryption();
         if(!config.cseMode || ['none', 'CSEv1r1'].indexOf(config.cseMode) === -1) config.cseMode = 'none';
@@ -70,10 +71,18 @@ export default class EnhancedApi extends SimpleApi {
      *
      * @param value
      * @param algorithm
+     * @param [length=40]
      * @returns {Promise<string>}
      */
-    getHash(value, algorithm = 'SHA-1') {
-        return this.config.encryption.getHash(value, algorithm);
+    getHash(value, algorithm = 'SHA-1', length = null) {
+        if(length === null) length = this._config.hashLength;
+        let hash = this.config.encryption.getHash(value, algorithm);
+
+        if(length !== 40) {
+            return hash.substr(0, length);
+        }
+
+        return hash;
     }
 
     /**
@@ -165,7 +174,7 @@ export default class EnhancedApi extends SimpleApi {
         }
 
         if(!object.hasOwnProperty('_encrypted')) object._encrypted = false;
-        object.hash = await this.config.encryption.getHash(data.password);
+        object.hash = await this.getHash(data.password);
         if(!object.label) this._generatePasswordTitle(object);
 
         if(this.config.encryption.enabled && object.cseType !== 'none') {
@@ -196,7 +205,7 @@ export default class EnhancedApi extends SimpleApi {
         }
 
         if(!object.hasOwnProperty('_encrypted')) object._encrypted = false;
-        object.hash = await this.config.encryption.getHash(data.password);
+        object.hash = await this.getHash(data.password);
         if(!object.label) this._generatePasswordTitle(object);
 
         if(this.config.encryption.enabled && object.cseType !== 'none' && (!data.hasOwnProperty('shared') || !data.shared)) {
