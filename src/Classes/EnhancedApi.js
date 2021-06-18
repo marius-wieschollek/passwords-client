@@ -74,9 +74,9 @@ export default class EnhancedApi extends SimpleApi {
      * @param [length=40]
      * @returns {Promise<string>}
      */
-    getHash(value, algorithm = 'SHA-1', length = null) {
-        if(length === null) length = this._config.hashLength;
-        let hash = this.config.encryption.getHash(value, algorithm);
+    async getHash(value, algorithm = 'SHA-1', length = null) {
+        if(length === null) length = this.config.hashLength;
+        let hash = await this.config.encryption.getHash(value, algorithm);
 
         if(length !== 40) {
             return hash.substr(0, length);
