@@ -1,6 +1,5 @@
 import sodium from 'libsodium-wrappers';
-import uuid from 'uuidv4';
-import BooleanState from '../../State/BooleanState';
+import { v4 as uuid } from 'uuid';
 
 export default class CSEv1Keychain {
 

@@ -3,6 +3,16 @@
     "version": "1.0.0.BUILD",
     "description": "JS client library for the Nextcloud Passwords app",
     "main": "src/main.js",
+    "exports": {
+        ".": "src/main.js",
+        "./models": "src/models.js",
+        "./errors": "src/errors.js",
+        "./utility": "src/utility.js",
+        "./boolean-state": "src/State/BooleanState.js",
+        "./basic-class-loader": "src/ClassLoader/BasicClassLoader.js",
+        "./default-class-loader": "src/ClassLoader/DefaultClassLoader.js",
+        "./enhanced-class-loader": "src/ClassLoader/EnhancedClassLoader.js"
+    },
     "author": "Marius Wieschollek",
     "license": "ISC",
     "keywords": [
@@ -17,9 +27,9 @@
     },
     "dependencies": {
         "eventemitter3": "^4.0.7",
-        "libsodium-wrappers": "^0.7.8",
-        "pako": "^1.0.11",
-        "url-parse": "^1.4.7",
-        "uuidv4": "^4.0.0"
+        "libsodium-wrappers": "^0.7.9",
+        "pako": "^2.0.4",
+        "url-parse": "^1.5.3",
+        "uuid": "^8.3.2"
     }
 }
