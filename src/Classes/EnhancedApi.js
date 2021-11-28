@@ -8,7 +8,7 @@ export default class EnhancedApi extends SimpleApi {
     /**
      * Is the user session authorized to make encrypted requests
      *
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     get isAuthorized() {
         return this._isAuthorized === true;
@@ -17,7 +17,7 @@ export default class EnhancedApi extends SimpleApi {
     /**
      * Is the encryption active and able to encrypt/decrypt
      *
-     * @returns {boolean}
+     * @returns {Boolean}
      */
     get hasEncryption() {
         return this.config.encryption.enabled;
@@ -892,7 +892,7 @@ export default class EnhancedApi extends SimpleApi {
         if(password.customFields) {
             password.customFields = JSON.parse(password.customFields);
         } else {
-            password.customFields = {};
+            password.customFields = [];
         }
 
 

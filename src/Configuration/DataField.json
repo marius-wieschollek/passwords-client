@@ -1,0 +1,14 @@
+{
+    "label": {
+        "type": "string",
+        "match": ".+{1,369}"
+    },
+    "type": {
+        "type": "string",
+        "match": "data"
+    },
+    "value": {
+        "type": "string",
+        "match": ".+{1,369}"
+    }
+}

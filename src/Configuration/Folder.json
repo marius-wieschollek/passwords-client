@@ -1,0 +1,85 @@
+{
+    "id": {
+        "type": "string",
+        "match": "",
+        "writeable": false
+    },
+    "revision": {
+        "type": "string",
+        "match": "",
+        "writeable": false
+    },
+    "label": {
+        "type": "string",
+        "match": ".+{1,64}",
+        "writeable": true
+    },
+    "parent": {
+        "type": "Folder",
+        "match": "",
+        "writeable": true
+    },
+    "parentId": {
+        "type": "Folder",
+        "match": "",
+        "writeable": true
+    },
+    "hidden": {
+        "type": "boolean",
+        "writeable": true
+    },
+    "trashed": {
+        "type": "boolean",
+        "writeable": false
+    },
+    "favorite": {
+        "type": "boolean",
+        "writeable": true
+    },
+    "cseType": {
+        "type": "string",
+        "match": "none|CSEv1r1",
+        "writeable": true
+    },
+    "cseKey": {
+        "type": "string",
+        "match": "",
+        "writeable": true
+    },
+    "sseType": {
+        "type": "string",
+        "match": "none|SSEv1r1|SSEv1r2|SSEv2r1",
+        "writeable": false
+    },
+    "client": {
+        "type": "string",
+        "writeable": false
+    },
+    "edited": {
+        "type": "date",
+        "writeable": true
+    },
+    "created": {
+        "type": "date",
+        "writeable": false
+    },
+    "updated": {
+        "type": "date",
+        "writeable": false
+    },
+    "revisions": {
+        "type": "FolderCollection",
+        "match": "",
+        "writeable": true
+    },
+    "passwords": {
+        "type": "PasswordCollection",
+        "match": "",
+        "writeable": true
+    },
+    "folders": {
+        "type": "FolderCollection",
+        "match": "",
+        "writeable": true
+    }
+}
