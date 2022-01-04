@@ -66,6 +66,7 @@ import InvalidEncryptedTextLength from "../Exception/Encryption/InvalidEncrypted
 import HashService from "../Services/HashService";
 import Logger from "../Logger/Logger";
 import DefectField from "../Model/CustomField/DefectField";
+import PreconditionFailedError from "../Exception/Http/PreconditionFailedError";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -147,6 +148,7 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'exception.http.403'              : ForbiddenError,
             'exception.http.404'              : NotFoundError,
             'exception.http.405'              : MethodNotAllowedError,
+            'exception.http.412'              : PreconditionFailedError,
             'exception.http.429'              : TooManyRequestsError,
             'exception.http.500'              : InternalServerError,
             'exception.http.502'              : BadGatewayError,

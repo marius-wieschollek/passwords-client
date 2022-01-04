@@ -14,6 +14,7 @@ import NotFoundError from "./Exception/Http/NotFoundError";
 import ServiceUnavailableError from "./Exception/Http/ServiceUnavailableError";
 import TooManyRequestsError from "./Exception/Http/TooManyRequestsError";
 import UnauthorizedError from "./Exception/Http/UnauthorizedError";
+import PreconditionFailedError from "./Exception/Http/PreconditionFailedError";
 import InvalidLink from "./Exception/PassLink/InvalidLink";
 import UnknownAction from "./Exception/PassLink/UnknownAction";
 import ChallengeTypeNotSupported from "./Exception/ChallengeTypeNotSupported";
@@ -51,5 +52,6 @@ export {
     ResponseContentTypeError,
     ResponseDecodingError,
     TokenTypeNotSupported,
-    UnknownPropertyError
+    UnknownPropertyError,
+    PreconditionFailedError
 };
