@@ -44,10 +44,10 @@ export default class Connect extends PassLinkAction {
      *
      * @return {Promise<null|object>|null}
      */
-    getTheme() {
+    async getTheme() {
         if(this._theme !== null) return this._theme;
 
-        return this._decodeTheme();
+        return await this._loadTheme();
     }
 
     /**
@@ -111,77 +111,19 @@ export default class Connect extends PassLinkAction {
      *
      * @private
      */
-    async _decodeTheme() {
-        if(this._parameters.hasOwnProperty('t')) {
-            let pako   = await import(/* webpackChunkName: "pako" */ 'pako'),
-                base64 = this._parameters.t,
-                zipped = atob(base64),
-                data   = pako.inflate(zipped, {to: 'string'});
+    async _loadTheme() {
+        let url     = `${this._parameters.baseUrl}index.php/apps/passwords/link/connect/theme`,
+            request = new HttpRequest(url);
 
-            return this._themeFromV1(data);
-        } else if(this._parameters.hasOwnProperty('theme')) {
-            let pako   = await import(/* webpackChunkName: "pako" */ 'pako'),
-                base64 = this._parameters.theme,
-                zipped = atob(base64),
-                data   = pako.inflate(zipped, {to: 'string'});
+        let data = {id: this._parameters.id};
 
-            return this._themeFromJson(data);
+        try {
+            let response = await request.setData(data).send();
+            this._theme = response.getData();
+
+            return response.getData();
+        } catch(e) {
+            return null;
         }
-        return null;
-    }
-
-    /**
-     * @param {String} data
-     * @return {Object|null}
-     * @private
-     */
-    _themeFromJson(data) {
-        let theme = JSON.parse(data);
-
-        if(theme.hasOwnProperty('color')) {
-            theme['color.primary'] = theme.color;
-            delete theme.color;
-        }
-        if(theme.hasOwnProperty('txtColor')) {
-            theme['color.text'] = theme.txtColor;
-            delete theme.txtColor;
-        }
-        if(theme.hasOwnProperty('bgColor')) {
-            theme['color.background'] = theme.bgColor;
-            delete theme.bgColor;
-        }
-        if(theme.hasOwnProperty('background') && theme.background.substr(0, 8) !== 'https://') {
-            theme.background = this._parameters.baseUrl + theme.background;
-        }
-        if(theme.hasOwnProperty('logo')) {
-            theme.logo = this._parameters.baseUrl + theme.logo;
-        }
-
-        this._theme = theme;
-
-        return theme;
-    }
-
-    /**
-     * @param {String} data
-     * @return {Object|null}
-     * @private
-     */
-    _themeFromV1(data) {
-        let parts = data.split('|');
-        if(parts.length !== 6) return null;
-
-        let theme = {};
-
-        theme['label'] = parts[0];
-        theme['logo'] = `${this._parameters.baseUrl}/${parts[1]}`;
-        theme['background'] = parts[2].substr(0, 3) === '://' ? `https${parts[2]}`:`${this._parameters.baseUrl}/${parts[2]}`;
-        theme['color.primary'] = parts[3].length === 6 ? '#' + parts[3]:parts[3];
-        theme['color.text'] = parts[4].length === 6 ? '#' + parts[4]:parts[4];
-        theme['color.background'] = parts[5].length === 6 ? '#' + parts[5]:parts[5];
-
-        this._theme = theme;
-
-        return theme;
     }
 }

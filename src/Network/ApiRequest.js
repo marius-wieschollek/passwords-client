@@ -282,8 +282,8 @@ export default class ApiRequest {
      * @private
      */
     _getHttpError(response) {
-        if([400, 401, 403, 404, 405, 429, 500, 502, 503, 504].indexOf(response.status) !== -1) {
-            return this._api.getClass(`exception.${response.status}`, response);
+        if([400, 401, 403, 404, 405, 412, 429, 500, 502, 503, 504].indexOf(response.status) !== -1) {
+            return this._api.getClass(`exception.http.${response.status}`, response);
         }
         if(response.status > 99) {
             return this._api.getClass('exception.http', response);
