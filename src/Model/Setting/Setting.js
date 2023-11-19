@@ -2,6 +2,8 @@ import InvalidScopeError from '../../Exception/InvalidScopeError';
 
 export default class Setting {
 
+    get MODEL_TYPE() {return 'setting';}
+
     /**
      * @return {String}
      */

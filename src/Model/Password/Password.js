@@ -3,6 +3,8 @@ import AbstractRevisionModel from '../AbstractRevisionModel';
 
 export default class Password extends AbstractRevisionModel {
 
+    get MODEL_TYPE() {return 'password';}
+
     /**
      *
      * @param {Object} [data={}]

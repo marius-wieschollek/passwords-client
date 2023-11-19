@@ -1,5 +1,7 @@
 export default class Session {
 
+    get MODEL_TYPE() {return 'session';}
+
     constructor(user = null, token = null, id = null, authorized = false) {
         this._user = user;
         this._token = token;

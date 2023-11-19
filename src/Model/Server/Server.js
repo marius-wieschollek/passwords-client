@@ -5,6 +5,8 @@ import ObjectMerger from '../../Utility/ObjectMerger';
 
 export default class Server extends AbstractModel {
 
+    get MODEL_TYPE() {return 'server';}
+
     /**
      *
      * @param {Object} data
