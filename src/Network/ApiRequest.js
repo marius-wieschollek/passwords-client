@@ -128,11 +128,19 @@ export default class ApiRequest {
 
         this._updateSessionId(httpResponse);
 
+        if(!httpResponse.ok) {
+            let error = this._getHttpError(httpResponse);
+            this._api.emit('request.error', error);
+            throw error;
+        }
+
         if(this._responseType !== null && contentType && contentType.indexOf(this._responseType) === -1) {
             let error = this._api.getClass('exception.contenttype', this._responseType, contentType, httpResponse);
             this._api.emit('request.error', error);
             throw error;
-        } else if(contentType && contentType.indexOf('application/json') !== -1) {
+        }
+
+        if(contentType && contentType.indexOf('application/json') !== -1) {
             await this._processJsonResponse(httpResponse, response);
         } else {
             await this._processBinaryResponse(httpResponse, response);
@@ -237,12 +245,6 @@ export default class ApiRequest {
      * @private
      */
     async _processJsonResponse(httpResponse, response) {
-        if(!httpResponse.ok) {
-            let error = this._getHttpError(httpResponse);
-            this._api.emit('request.error', error);
-            throw error;
-        }
-
         try {
             let json = await httpResponse.json();
             response.setData(json);
@@ -260,12 +262,6 @@ export default class ApiRequest {
      * @private
      */
     async _processBinaryResponse(httpResponse, response) {
-        if(!httpResponse.ok) {
-            let error = this._getHttpError(httpResponse);
-            this._api.emit('request.error', error);
-            throw error;
-        }
-
         try {
             let blob = await httpResponse.blob();
             response.setData(blob);
