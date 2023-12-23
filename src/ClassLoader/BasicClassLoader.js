@@ -1,5 +1,3 @@
-import ObjectMerger from "../Utility/ObjectMerger";
-
 export default class BasicClassLoader {
 
     constructor(classes = {}) {

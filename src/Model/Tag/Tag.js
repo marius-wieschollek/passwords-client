@@ -3,6 +3,8 @@ import AbstractRevisionModel from '../AbstractRevisionModel';
 
 export default class Tag extends AbstractRevisionModel {
 
+    get MODEL_TYPE() {return 'tag';}
+
     /**
      *
      * @param {Object} [data={}]

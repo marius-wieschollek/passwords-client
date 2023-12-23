@@ -36,7 +36,6 @@ import ExportV1Encryption from "../Encryption/ExportV1Encryption";
 import CSEv1Keychain from "../Encryption/Keychain/CSEv1Keychain";
 import Cache from "../Cache/Cache";
 import BooleanState from "../State/BooleanState";
-import EventEmitter from "eventemitter3";
 import ResponseContentTypeError from "../Exception/ResponseContentTypeError";
 import ResponseDecodingError from "../Exception/ResponseDecodingError";
 import UnknownPropertyError from "../Exception/UnknownPropertyError";
@@ -67,6 +66,7 @@ import HashService from "../Services/HashService";
 import Logger from "../Logger/Logger";
 import DefectField from "../Model/CustomField/DefectField";
 import PreconditionFailedError from "../Exception/Http/PreconditionFailedError";
+import EventEmitter from "../Event/EventEmitter";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 

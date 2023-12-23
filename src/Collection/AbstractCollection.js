@@ -82,6 +82,63 @@ export default class AbstractCollection {
     }
 
     /**
+     * Get the first item from the collection
+     *
+     * @returns {AbstractModel|null}
+     */
+    first() {
+        if(this._elements.length === 0) return null;
+        return this._elements[0];
+    }
+
+    /**
+     * Get the last item from the collection
+     *
+     * @returns {AbstractModel|null}
+     */
+    last() {
+        if(this._elements.length === 0) return null;
+        return this._elements[this._elements.length - 1];
+    }
+
+    /**
+     * Applies the callback to every item in the collection and returns the result
+     *
+     * @param {Function} callback
+     * @returns {Array<*>}
+     */
+    map(callback) {
+        let items      = [],
+            collection = this.getReference();
+
+        for(let item of collection) {
+            items.push(callback(item));
+        }
+
+        return items;
+    }
+
+    /**
+     * Get a reference to the internal items array
+     *
+     * @returns {AbstractModel[]}
+     * @api
+     */
+    getReference() {
+        return this._elements;
+    }
+
+    /**
+     * Get a clone of the internal items array
+     *
+     * @returns {AbstractModel[]}
+     * @api
+     */
+    getClone() {
+        return this._elements.slice(0);
+    }
+
+    /**
      *
      * @param {(AbstractModel|AbstractModel[])} elements
      */

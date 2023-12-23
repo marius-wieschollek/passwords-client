@@ -2,6 +2,8 @@ import AbstractModel from '../AbstractModel';
 
 export default class AbstractField extends AbstractModel {
 
+    get MODEL_TYPE() {return 'custom-field';}
+
     /**
      * @param {String} value
      */

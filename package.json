@@ -4,14 +4,18 @@
     "description": "JS client library for the Nextcloud Passwords app",
     "main": "src/main.js",
     "exports": {
-        ".": "src/main.js",
-        "./models": "src/models.js",
-        "./errors": "src/errors.js",
-        "./utility": "src/utility.js",
-        "./boolean-state": "src/State/BooleanState.js",
-        "./basic-class-loader": "src/ClassLoader/BasicClassLoader.js",
-        "./default-class-loader": "src/ClassLoader/DefaultClassLoader.js",
-        "./enhanced-class-loader": "src/ClassLoader/EnhancedClassLoader.js"
+        ".": "./src/main.js",
+        "./models": "./src/models.js",
+        "./errors": "./src/errors.js",
+        "./utility": "./src/utility.js",
+        "./passlink": "./src/PassLink/PassLink",
+        "./boolean-state": "./src/State/BooleanState.js",
+        "./event-emitter": "./src/Event/EventEmitter.js",
+        "./client": "./src/Client/PasswordsClient.js",
+        "./basic-client": "./src/Client/BasicPasswordsClient.js",
+        "./basic-class-loader": "./src/ClassLoader/BasicClassLoader.js",
+        "./default-class-loader": "./src/ClassLoader/DefaultClassLoader.js",
+        "./enhanced-class-loader": "./src/ClassLoader/EnhancedClassLoader.js"
     },
     "author": "Marius Wieschollek",
     "license": "ISC",
@@ -26,7 +30,6 @@
         "url": "https://git.mdns.eu/nextcloud/passwords-client.git"
     },
     "dependencies": {
-        "eventemitter3": "^4.0.7",
         "libsodium": "0.7.10",
         "libsodium-wrappers": "0.7.10",
         "url-parse": "^1.5.3",

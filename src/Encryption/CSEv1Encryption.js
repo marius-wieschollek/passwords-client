@@ -50,7 +50,7 @@ export default class CSEv1Encryption {
             key    = this._keychain.getCurrentKey();
 
         for(let field of fields) {
-            let data  = object[field];
+            let data = object[field];
 
             if(data === null || data === undefined || data.length === 0) continue;
             object[field] = this._encryptString(data, key);
@@ -78,7 +78,7 @@ export default class CSEv1Encryption {
             key    = this._keychain.getKey(object.cseKey);
 
         for(let field of fields) {
-            let data  = object[field];
+            let data = object[field];
 
             if(data === null || data.length === 0) continue;
             object[field] = this._decryptString(data, key);
@@ -120,7 +120,7 @@ export default class CSEv1Encryption {
     /**
      * Encrypt the message with the given key
      *
-     * @param {Uint8Array} message
+     * @param {String} message
      * @param {Uint8Array} key
      * @returns {Uint8Array}
      * @private
