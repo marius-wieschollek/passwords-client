@@ -1,5 +1,5 @@
 import AbstractField from './AbstractField';
-import Properties from '../../Configuration/UrlField';
+import Properties from '../../Configuration/UrlField.json';
 
 export default class UrlField extends AbstractField {
 

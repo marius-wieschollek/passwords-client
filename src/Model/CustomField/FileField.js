@@ -1,5 +1,5 @@
 import AbstractField from './AbstractField';
-import Properties from '../../Configuration/FileField';
+import Properties from '../../Configuration/FileField.json';
 
 export default class FileField extends AbstractField {
 

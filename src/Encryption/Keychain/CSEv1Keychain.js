@@ -1,5 +1,4 @@
 import sodium from 'libsodium-wrappers';
-import { v4 as uuid } from 'uuid';
 
 export default class CSEv1Keychain {
 
@@ -54,6 +53,15 @@ export default class CSEv1Keychain {
         }
 
         throw this._classLoader.getClass('exception.encryption.key.missing', id);
+    }
+
+    /**
+     * Get a key by id
+     *
+     * @returns {String[]}
+     */
+    listKeys() {
+        return Object.keys(this._keys);
     }
 
     /**
@@ -131,7 +139,7 @@ export default class CSEv1Keychain {
      * Add a new key to the keychain and set it as current
      */
     update() {
-        let uuid = uuid();
+        let uuid = this._createUuid();
         this._keys[uuid] = sodium.randombytes_buf(sodium.crypto_secretbox_KEYBYTES);
         this._current = uuid;
         this._enabled.set(true);
@@ -184,6 +192,16 @@ export default class CSEv1Keychain {
             sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
             sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
             sodium.crypto_pwhash_ALG_DEFAULT
+        );
+    }
+    /**
+     * Create a uuidv4
+     *
+     * @returns {String}
+     */
+    _createUuid() {
+        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
         );
     }
 }

@@ -80,7 +80,7 @@ export default class PWDv1Challenge {
                 genericHashKey
             );
 
-        let passwordHashSalt = sodium.sodium(sodium.crypto_pwhash_SALTBYTES),
+        let passwordHashSalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES),
             passwordHash     = sodium.crypto_pwhash(
                 sodium.crypto_box_SEEDBYTES,
                 genericHash,

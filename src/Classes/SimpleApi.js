@@ -17,6 +17,7 @@ export default class SimpleApi {
      * SimpleApi Constructor
      */
     constructor() {
+        this._client = null;
         this._config = {};
         this._headers = {};
         this._paths = {
@@ -73,6 +74,7 @@ export default class SimpleApi {
             'service.favicon'        : 'api/1.0/service/favicon/{domain}/{size}',
             'service.preview'        : 'api/1.0/service/preview/{domain}/{view}/{width}/{height}',
             'service.password-change': 'api/1.0/service/password-change',
+            'service.hashes'         : 'api/1.0/service/hashes',
             'cron.sharing'           : 'cron/sharing',
             'link.request'           : 'link/connect/request',
             'link.await'             : 'link/connect/await',
@@ -95,22 +97,17 @@ export default class SimpleApi {
     }
 
     /**
-     * @param config
+     * @param {Object} config
+     * @param {BasicPasswordsClient} client
      */
-    initialize(config = {}) {
+    initialize(config, client) {
         this._enabled = false;
+        this._client = client;
         this._config = config;
         if(config.apiUrl.substr(0, 5) !== 'https') throw new Error('HTTPS required for api');
 
         this._headers = {};
         if(config.headers) this._headers = config.headers;
-
-        if(config.user !== null && config.password !== null) {
-            this._headers.Authorization = `Basic ${btoa(`${config.user}:${config.password}`)}`;
-        } else {
-            // @TODO Use custom error here
-            throw new Error('API username or password missing');
-        }
 
         this._enabled = true;
     }
@@ -640,6 +637,14 @@ export default class SimpleApi {
         return this._sendRequest('service.password-change', {domain});
     }
 
+    /**
+     *
+     * @returns {Promise}
+     */
+    getHashes(range) {
+        return this._sendRequest('service.hashes', {range});
+    }
+
 
     /**
      * Account Management
@@ -796,6 +801,8 @@ export default class SimpleApi {
             headers.append(header, this._headers[header]);
         }
         headers.append('Accept', dataType);
+        headers.append('Authorization', `Basic ${btoa(`${this._client.getServer().getUser()}:${this._client.getServer().getToken()}`)}`);
+        headers.append('x-api-session', this._client.getSession().getId());
 
         let options = {method, headers, credentials: 'omit', redirect: 'error'};
         if(data) {
@@ -825,7 +832,12 @@ export default class SimpleApi {
             path = this._paths[path];
         }
 
-        path = this._config.apiUrl + path;
+        path = this._client.getServer().getApiUrl() + path;
+
+        if(path.indexOf('api/api') !== -1) {
+            path = path.replace('api/api', 'api');
+        }
+
         return path;
     }
 
@@ -866,8 +878,7 @@ export default class SimpleApi {
             }
 
             let oldSessionToken = this._config.sessionToken;
-            this._config.sessionToken = sessionToken;
-            this._headers['X-API-SESSION'] = sessionToken;
+            this._client.getSession().setId(sessionToken);
             this._config.events.emit('api.session.token.changed', {sessionToken, oldSessionToken});
         }
     }

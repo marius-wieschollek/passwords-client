@@ -6,7 +6,7 @@ image: node:13-alpine
 Publish Alpha:
   stage: publishing
   script:
-    - sed -i -e "s|.BUILD|-alpha.${CI_PIPELINE_ID}|g" ./package.json
+    - sed -i -e "s|-alpha1000|-alpha.${CI_PIPELINE_ID}|g" ./package.json
     - npm publish --tag alpha
   environment:
     name: Alpha
@@ -16,7 +16,7 @@ Publish Alpha:
 Publish Beta:
   stage: publishing
   script:
-    - sed -i -e "s|.BUILD|-beta.${CI_PIPELINE_ID}|g" ./package.json
+    - sed -i -e "s|-alpha1000|-beta.${CI_PIPELINE_ID}|g" ./package.json
     - npm publish --tag beta
   environment:
     name: Beta
@@ -26,7 +26,7 @@ Publish Beta:
 Publish Release:
   stage: publishing
   script:
-    - sed -i -e "s|.BUILD||g" ./package.json
+    - sed -i -e "s|-alpha1000||g" ./package.json
     - npm publish --tag latest
   environment:
     name: Stable

@@ -1,6 +1,5 @@
 import Url from 'url-parse';
 import SimpleApi from './SimpleApi';
-import Encryption from './Encryption';
 import EventEmitter from 'eventemitter3';
 
 export default class EnhancedApi extends SimpleApi {
@@ -11,7 +10,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Boolean}
      */
     get isAuthorized() {
-        return this._isAuthorized === true;
+        return this._client.isAuthorized();
     }
 
     /**
@@ -20,32 +19,24 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Boolean}
      */
     get hasEncryption() {
-        return this.config.encryption.enabled;
+        return this._client.getCseV1Encryption().enabled();
     }
 
-    /**
-     *
-     * @param props
-     */
-    constructor(props) {
-        super(props);
-
-        this._isAuthorized = false;
+    constructor() {
+        super();
     }
 
     /**
      * Initialize the api object
      *
-     * @param config
+     * @param {BasicPasswordsClient} client
      */
-    initialize(config = {}) {
-        if(!config.baseUrl || config.baseUrl.substr(0, 5) !== 'https') throw new Error('Invalid Base URL given');
+    initialize(client, config = {}) {
+        config.baseUrl = client.getServer().getBaseUrl();
 
         if(!config.folderIcon) config.folderIcon = `${config.baseUrl}core/img/filetypes/folder.svg`;
         if(!config.apiUrl) config.apiUrl = `${config.baseUrl}index.php/apps/passwords/`;
         if(!config.hashLength) config.hashLength = 40;
-
-        if(!config.encryption) config.encryption = new Encryption();
         if(!config.cseMode || ['none', 'CSEv1r1'].indexOf(config.cseMode) === -1) config.cseMode = 'none';
 
         if(!config.device) {
@@ -63,7 +54,7 @@ export default class EnhancedApi extends SimpleApi {
             if(d.oldSessionToken) this._resetAuthorisation();
         });
 
-        super.initialize(config);
+        super.initialize(config, client);
     }
 
     /**
@@ -76,10 +67,10 @@ export default class EnhancedApi extends SimpleApi {
      */
     async getHash(value, algorithm = 'SHA-1', length = null) {
         if(length === null) length = this.config.hashLength;
-        let hash = await this.config.encryption.getHash(value, algorithm);
+        let hash = await this._client.getInstance('service.hash').getHash(value, algorithm);
 
-        if(length !== 40) {
-            return hash.substr(0, length);
+        if(length < hash.length) {
+            return hash.substring(0, length);
         }
 
         return hash;
@@ -93,22 +84,23 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async openSession(login) {
-        let password = null;
+        /** @type {SessionAuthorization} **/
+        let authRequest = this._client.getClass('authorization.session');
+        await authRequest.load();
+        this._client.setInstance('authorization.session', authRequest);
+
         if(login.hasOwnProperty('password')) {
-            login.challenge = this.config.encryption.solveChallenge(login.password, login.salts);
-            password = login.password;
-            delete login.salts;
-            delete login.password;
+            authRequest.getChallenge().setPassword(login.password);
         }
 
-        let result = await this._sendRequest('session.open', login);
-        if(password !== null && result.hasOwnProperty('keys') && result.keys.hasOwnProperty('CSEv1r1')) {
-            this.config.encryption.setKeychain(result.keys.CSEv1r1, password);
+        if(login.hasOwnProperty('token')) {
+            let provider = Object.keys(login.token)[0];
+
+            authRequest.setActiveToken(provider);
+            authRequest.getActiveToken().setToken(login.token[provider]);
         }
 
-        this._isAuthorized = true;
-
-        return result;
+        await authRequest.authorize();
     }
 
     /**
@@ -117,9 +109,8 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async closeSession() {
-        let result = await super.closeSession();
         this._resetAuthorisation();
-        return result;
+        return true;
     }
 
 
@@ -138,16 +129,32 @@ export default class EnhancedApi extends SimpleApi {
     async setAccountChallenge(password, oldPassword = null) {
         let oldSecret = null;
         if(oldPassword !== null) {
-            let oldChallenge = await super.getAccountChallenge();
-            oldSecret = this.config.encryption.solveChallenge(oldPassword, oldChallenge.salts);
+            let oldChallengeData = await super.getAccountChallenge();
+            let challenge = this._client.getClass('challenge.pwdv1', oldChallengeData);
+            challenge.setPassword(oldPassword);
+            oldSecret = challenge.solve();
         }
 
-        let challenge = this.config.encryption.createChallenge(password);
+        let challenge = this._client.getClass('challenge.pwdv1', {});
+        challenge.setPassword(password);
+        let data = challenge.create();
 
-        let result = await super.setAccountChallenge(challenge.secret, challenge.salts, oldSecret);
+        let result = await super.setAccountChallenge(data.secret, data.salts, oldSecret);
         if(result.success) {
-            let keychain = this.config.encryption.getKeychain(password, true);
-            await super.setKeychain('CSEv1r1', keychain);
+            let keychain = this._client.getCseV1Encryption().getKeychain(),
+                initial  = keychain === null;
+            if(initial) {
+                keychain = this._client.getClass('keychain.csev1', null, null);
+            }
+
+            keychain.setPassword(password);
+            keychain.update();
+
+            let data = keychain.export();
+            await super.setKeychain('CSEv1r1', data);
+            if(initial) {
+                this._client.getCseV1Encryption().setKeychain(keychain);
+            }
         }
 
         return result;
@@ -177,13 +184,18 @@ export default class EnhancedApi extends SimpleApi {
         object.hash = await this.getHash(data.password);
         if(!object.label) this._generatePasswordTitle(object);
 
-        if(this.config.encryption.enabled && object.cseType !== 'none') {
-            this.config.encryption.encryptObject(object, 'password');
+        if(!object._encrypted && this.hasEncryption && object.cseType !== 'none') {
+            let encryption = this._client.getCseV1Encryption();
+            object = await encryption.encrypt(object, 'password');
         } else {
             object.cseKey = '';
         }
 
-        return await super.createPassword(object);
+        let result = await super.createPassword(object);
+        object.id = result.id;
+        object.revison = result.revison;
+
+        return object;
     }
 
     /**
@@ -208,14 +220,18 @@ export default class EnhancedApi extends SimpleApi {
         object.hash = await this.getHash(data.password);
         if(!object.label) this._generatePasswordTitle(object);
 
-        if(this.config.encryption.enabled && object.cseType !== 'none' && (!data.hasOwnProperty('shared') || !data.shared)) {
-            this.config.encryption.encryptObject(object, 'password');
+        if(!object._encrypted && this.hasEncryption && object.cseType !== 'none') {
+            let encryption = this._client.getCseV1Encryption();
+            object = await encryption.encrypt(object, 'password');
         } else {
-            object.cseType = 'none';
             object.cseKey = '';
         }
 
-        return await super.updatePassword(object);
+        let result = await super.updatePassword(object);
+        object.id = result.id;
+        object.revison = result.revison;
+
+        return object;
     }
 
     /**
@@ -226,7 +242,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async showPassword(id, detailLevel = 'model') {
-        return this._processPassword(
+        return await this._processPassword(
             await super.showPassword(id, detailLevel)
         );
     }
@@ -238,7 +254,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async listPasswords(detailLevel = 'model') {
-        return this._processPasswordList(
+        return await this._processPasswordList(
             await super.listPasswords(detailLevel)
         );
     }
@@ -251,7 +267,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async findPasswords(criteria = {}, detailLevel = 'model') {
-        return this._processPasswordList(
+        return await this._processPasswordList(
             await super.findPasswords(criteria, detailLevel)
         );
     }
@@ -267,7 +283,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param data
      * @returns {Promise}
      */
-    createFolder(data = {}) {
+    async createFolder(data = {}) {
         let object = this._cloneObject(data);
 
         try {
@@ -277,13 +293,18 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled && object.cseType !== 'none') {
-            this.config.encryption.encryptObject(object, 'folder');
+        if(this.hasEncryption && object.cseType !== 'none') {
+            let encryption = this._client.getCseV1Encryption();
+            object = await encryption.encrypt(object, 'folder');
         } else {
             object.cseKey = '';
         }
 
-        return super.createFolder(object);
+        let result = await super.createFolder(object);
+        object.id = result.id;
+        object.revison = result.revison;
+
+        return object;
     }
 
     /**
@@ -293,7 +314,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param data
      * @returns {Promise}
      */
-    updateFolder(data = {}) {
+    async updateFolder(data = {}) {
         if(!data.id) return this.createFolder(data);
         let object = this._cloneObject(data);
 
@@ -304,13 +325,18 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled && object.cseType !== 'none') {
-            this.config.encryption.encryptObject(object, 'folder');
+        if(this.hasEncryption && object.cseType !== 'none') {
+            let encryption = this._client.getCseV1Encryption();
+            object = await encryption.encrypt(object, 'folder');
         } else {
             object.cseKey = '';
         }
 
-        return super.updateFolder(object);
+        let result = await super.updateFolder(object);
+        object.id = result.id;
+        object.revison = result.revison;
+
+        return object;
     }
 
     /**
@@ -321,7 +347,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async showFolder(id, detailLevel = 'model') {
-        return this._processFolder(
+        return await this._processFolder(
             await super.showFolder(id, detailLevel)
         );
     }
@@ -333,7 +359,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async listFolders(detailLevel = 'model') {
-        return this._processFolderList(
+        return await this._processFolderList(
             await super.listFolders(detailLevel)
         );
     }
@@ -346,7 +372,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async findFolders(criteria = {}, detailLevel = 'model') {
-        return this._processFolderList(
+        return await this._processFolderList(
             await super.findFolders(criteria, detailLevel)
         );
     }
@@ -362,7 +388,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param data
      * @returns {Promise}
      */
-    createTag(data = {}) {
+    async createTag(data = {}) {
         let object = this._cloneObject(data);
 
         try {
@@ -372,13 +398,18 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled && object.cseType !== 'none') {
-            this.config.encryption.encryptObject(object, 'tag');
+        if(this.hasEncryption && object.cseType !== 'none') {
+            let encryption = this._client.getCseV1Encryption();
+            object = await encryption.encrypt(object, 'tag');
         } else {
             object.cseKey = '';
         }
 
-        return super.createTag(object);
+        let result = await super.createTag(object);
+        object.id = result.id;
+        object.revison = result.revison;
+
+        return object;
     }
 
     /**
@@ -388,7 +419,7 @@ export default class EnhancedApi extends SimpleApi {
      * @param data
      * @returns {Promise}
      */
-    updateTag(data = {}) {
+    async updateTag(data = {}) {
         if(!data.id) return this.createTag(data);
         let object = this._cloneObject(data);
 
@@ -399,13 +430,18 @@ export default class EnhancedApi extends SimpleApi {
             return this._createRejectedPromise(e);
         }
 
-        if(this.config.encryption.enabled && object.cseType !== 'none') {
-            this.config.encryption.encryptObject(object, 'tag');
+        if(this.hasEncryption && object.cseType !== 'none') {
+            let encryption = this._client.getCseV1Encryption();
+            object = await encryption.encrypt(object, 'tag');
         } else {
             object.cseKey = '';
         }
 
-        return super.updateTag(object);
+        let result = await super.updateTag(object);
+        object.id = result.id;
+        object.revison = result.revison;
+
+        return object;
     }
 
     /**
@@ -416,7 +452,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async showTag(id, detailLevel = 'model') {
-        return this._processTag(
+        return await this._processTag(
             await super.showTag(id, detailLevel)
         );
     }
@@ -428,7 +464,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async listTags(detailLevel = 'model') {
-        return this._processTagList(
+        return await this._processTagList(
             await super.listTags(detailLevel)
         );
     }
@@ -441,7 +477,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async findTags(criteria = {}, detailLevel = 'model') {
-        return this._processTagList(
+        return await this._processTagList(
             await super.findTags(criteria, detailLevel)
         );
     }
@@ -496,7 +532,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async showShare(id, detailLevel = 'model') {
-        return this._processShare(
+        return await this._processShare(
             await super.showShare(id, detailLevel)
         );
     }
@@ -508,7 +544,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async listShares(detailLevel = 'model') {
-        return this._processShareList(
+        return await this._processShareList(
             await super.listShares(detailLevel)
         );
     }
@@ -521,7 +557,7 @@ export default class EnhancedApi extends SimpleApi {
      * @returns {Promise}
      */
     async findShares(criteria = {}, detailLevel = 'model') {
-        return this._processShareList(
+        return await this._processShareList(
             await super.findShares(criteria, detailLevel)
         );
     }
@@ -846,14 +882,14 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param data
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processPasswordList(data) {
+    async _processPasswordList(data) {
         let passwords = {};
 
         for(let i = 0; i < data.length; i++) {
-            let password = this._processPassword(data[i]);
+            let password = await this._processPassword(data[i]);
             passwords[password.id] = password;
         }
 
@@ -863,16 +899,16 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param password
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processPassword(password) {
-        if(password.hasOwnProperty('cseType') && password.cseType !== 'none') {
-            this.config.encryption.decryptObject(password, 'password');
-        } else {
-            password._encrypted = false;
+    async _processPassword(password) {
+        if(password.cseType === 'CSEv1r1' && password._encrypted !== false) {
+            let encryption = this._client.getCseV1Encryption();
+            password = await encryption.decrypt(password, 'password');
         }
 
+        password._encrypted = false;
         password.type = 'password';
         if(password.url) {
             let host    = this.parseUrl(password.url, 'host'),
@@ -897,19 +933,19 @@ export default class EnhancedApi extends SimpleApi {
 
 
         if(password.tags) {
-            password.tags = this._processTagList(password.tags);
+            password.tags = await this._processTagList(password.tags);
         }
         if(password.revisions) {
-            password.revisions = this._processPasswordList(password.revisions);
+            password.revisions = await this._processPasswordList(password.revisions);
         }
         if(typeof password.folder === 'object') {
-            password.folder = this._processFolder(password.folder);
+            password.folder = await this._processFolder(password.folder);
         }
         if(password.share !== null && typeof password.share === 'object') {
-            password.share = this._processShare(password.share);
+            password.share = await this._processShare(password.share);
         }
         if(Array.isArray(password.shares)) {
-            password.shares = this._processShareList(password.shares);
+            password.shares = await this._processShareList(password.shares);
         }
 
         password.created = new Date(password.created * 1e3);
@@ -922,14 +958,14 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param data
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processFolderList(data) {
+    async _processFolderList(data) {
         let folders = {};
 
         for(let i = 0; i < data.length; i++) {
-            let folder = this._processFolder(data[i]);
+            let folder = await this._processFolder(data[i]);
             folders[folder.id] = folder;
         }
 
@@ -939,29 +975,29 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param folder
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processFolder(folder) {
-        if(folder.hasOwnProperty('cseType') && folder.cseType !== 'none') {
-            this.config.encryption.decryptObject(folder, 'folder');
-        } else {
-            folder._encrypted = false;
+    async _processFolder(folder) {
+        if(folder.cseType === 'CSEv1r1' && folder._encrypted !== false) {
+            let encryption = this._client.getCseV1Encryption();
+            folder = await encryption.decrypt(folder, 'folder');
         }
+        folder._encrypted = false;
 
         folder.type = 'folder';
-        folder.icon = this._config.folderIcon;
+        folder.icon = this.config.folderIcon;
         if(folder.folders) {
-            folder.folders = this._processFolderList(folder.folders);
+            folder.folders = await this._processFolderList(folder.folders);
         }
         if(folder.passwords) {
-            folder.passwords = this._processPasswordList(folder.passwords);
+            folder.passwords = await this._processPasswordList(folder.passwords);
         }
         if(folder.revisions) {
-            folder.revisions = this._processFolderList(folder.revisions);
+            folder.revisions = await this._processFolderList(folder.revisions);
         }
         if(typeof folder.parent !== 'string') {
-            folder.parent = this._processFolder(folder.parent);
+            folder.parent = await this._processFolder(folder.parent);
         }
 
         folder.created = new Date(folder.created * 1e3);
@@ -974,14 +1010,14 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param data
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processTagList(data) {
+    async _processTagList(data) {
         let tags = {};
 
         for(let i = 0; i < data.length; i++) {
-            let tag = this._processTag(data[i]);
+            let tag = await this._processTag(data[i]);
             tags[tag.id] = tag;
         }
 
@@ -991,22 +1027,22 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param tag
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processTag(tag) {
-        if(tag.hasOwnProperty('cseType') && tag.cseType !== 'none') {
-            this.config.encryption.decryptObject(tag, 'tag');
-        } else {
-            tag._encrypted = false;
+    async _processTag(tag) {
+        if(tag.cseType === 'CSEv1r1' && tag._encrypted !== false) {
+            let encryption = this._client.getCseV1Encryption();
+            tag = await encryption.decrypt(tag, 'tag');
         }
+        tag._encrypted = false;
 
         tag.type = 'tag';
         if(tag.passwords) {
-            tag.passwords = this._processPasswordList(tag.passwords);
+            tag.passwords = await this._processPasswordList(tag.passwords);
         }
         if(tag.revisions) {
-            tag.revisions = this._processTagList(tag.revisions);
+            tag.revisions = await this._processTagList(tag.revisions);
         }
         tag.created = new Date(tag.created * 1e3);
         tag.updated = new Date(tag.updated * 1e3);
@@ -1018,14 +1054,14 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param data
-     * @returns {{}}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processShareList(data) {
+    async _processShareList(data) {
         let shares = {};
 
         for(let i = 0; i < data.length; i++) {
-            let share = this._processShare(data[i]);
+            let share = await this._processShare(data[i]);
             shares[share.id] = share;
         }
 
@@ -1035,14 +1071,14 @@ export default class EnhancedApi extends SimpleApi {
     /**
      *
      * @param share
-     * @returns {*}
+     * @returns {Promise<{}>}
      * @private
      */
-    _processShare(share) {
+    async _processShare(share) {
         share.type = 'share';
 
         if(typeof share.password !== 'string') {
-            share.password = this._processPassword(share.password);
+            share.password = await this._processPassword(share.password);
         }
 
         share.created = new Date(share.created * 1e3);
@@ -1131,8 +1167,7 @@ export default class EnhancedApi extends SimpleApi {
      * @private
      */
     _resetAuthorisation() {
-        this._isAuthorized = false;
-        this.config.encryption.unsetKeychain();
+        this._client.closeSession();
     }
 
 
@@ -1150,9 +1185,9 @@ export default class EnhancedApi extends SimpleApi {
             cseDefault = 'none';
 
         if(this.hasEncryption) {
-            cseDefault = this.config.cseMode;
+            cseDefault = 'CSEv1r1';
             cseTypes.push('CSEv1r1');
-            cseKeys = this.config.encryption.keys;
+            cseKeys = this._client.getCseV1Encryption().getKeychain().listKeys();
             cseKeys.push('');
         }
 
@@ -1244,9 +1279,9 @@ export default class EnhancedApi extends SimpleApi {
             cseDefault = 'none';
 
         if(this.hasEncryption) {
-            cseDefault = this.config.cseMode;
+            cseDefault = 'CSEv1r1';
             cseTypes.push('CSEv1r1');
-            cseKeys = this.config.encryption.keys;
+            cseKeys = this._client.getCseV1Encryption().getKeychain().listKeys();
             cseKeys.push('');
         }
 
@@ -1310,9 +1345,9 @@ export default class EnhancedApi extends SimpleApi {
             cseDefault = 'none';
 
         if(this.hasEncryption) {
-            cseDefault = this.config.cseMode;
+            cseDefault = 'CSEv1r1';
             cseTypes.push('CSEv1r1');
-            cseKeys = this.config.encryption.keys;
+            cseKeys = this._client.getCseV1Encryption().getKeychain().listKeys();
             cseKeys.push('');
         }
 

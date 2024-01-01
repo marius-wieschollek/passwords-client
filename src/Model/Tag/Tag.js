@@ -1,4 +1,4 @@
-import Properties from '../../Configuration/Tag';
+import Properties from '../../Configuration/Tag.json';
 import AbstractRevisionModel from '../AbstractRevisionModel';
 
 export default class Tag extends AbstractRevisionModel {

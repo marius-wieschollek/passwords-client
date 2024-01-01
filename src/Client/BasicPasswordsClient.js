@@ -120,6 +120,18 @@ export default class BasicPasswordsClient {
 
     /**
      *
+     * @return {Session}
+     */
+    closeSession() {
+        this.getRequest()
+            .setPath('1.0/session/close')
+            .send();
+
+        return this.renewSession();
+    }
+
+    /**
+     *
      * @returns {SessionAuthorization}
      */
     getSessionAuthorization() {

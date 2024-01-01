@@ -1,4 +1,4 @@
-import Properties from '../../Configuration/Password';
+import Properties from '../../Configuration/Password.json';
 import AbstractRevisionModel from '../AbstractRevisionModel';
 
 export default class Password extends AbstractRevisionModel {

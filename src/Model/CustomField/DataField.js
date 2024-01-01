@@ -1,5 +1,5 @@
 import AbstractField from './AbstractField';
-import Properties from '../../Configuration/DataField';
+import Properties from '../../Configuration/DataField.json';
 
 export default class DataField extends AbstractField {
 
