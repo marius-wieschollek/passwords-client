@@ -639,7 +639,7 @@ export default class SimpleApi {
 
     /**
      *
-     * @returns {Promise}
+     * @returns {Promise<String[]>}
      */
     getHashes(range) {
         return this._sendRequest('service.hashes', {range});

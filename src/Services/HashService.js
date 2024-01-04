@@ -42,10 +42,40 @@ export default class HashService {
         return 'Argon2';
     }
 
-    constructor(classLoader) {
-        this._ready = classLoader.getClass('state.boolean', false);
+    /**
+     *
+     * @param {BasicPasswordsClient} client
+     */
+    constructor(client) {
+        this._ready = client.getClass('state.boolean', false);
+        this._client = client;
+        this._breachedHashesCache = {};
 
         sodium.ready.then(() => {this._ready.set(true);});
+    }
+
+    /**
+     * Retrieves breached hashes for the given SHA-1 hash range.
+     *
+     * @param {String} range The range to retrieve breached hashes for. At least 5, maximum 40 characters
+     * @throws {InvalidRangeError} If the length of the range is less than 5 or greater than 40.
+     * @returns {Promise<String[]>} A promise that resolves to an array of breached hashes.
+     */
+    async getBreachedHashes(range) {
+        if(range.length < 5 || range.length > 40) throw this._client.getClass('exception.service.range');
+
+        if(this._breachedHashesCache.hasOwnProperty(range)) {
+            return this._breachedHashesCache[range];
+        }
+
+        let response = await this._client.getRequest()
+            .setPath('1.0/service/hashes')
+            .setData({range})
+            .send();
+
+        this._breachedHashesCache[range] = response.getData();
+
+        return response.getData();
     }
 
     /**
@@ -60,7 +90,7 @@ export default class HashService {
 
         if([this.HASH_SHA_1, this.HASH_SHA_256, this.HASH_SHA_384, this.HASH_SHA_512].indexOf(algorithm) !== -1) {
             return await this._makeShaHash(value, algorithm);
-        } else if(algorithm.substr(0, 7) === this.HASH_BLAKE2B) {
+        } else if(algorithm.substring(0, 7) === this.HASH_BLAKE2B) {
             return this._makeBlake2bHash(algorithm, value);
         } else if(algorithm === this.HASH_ARGON2) {
             return sodium.crypto_pwhash_str(value, sodium.crypto_pwhash_OPSLIMIT_MIN, sodium.crypto_pwhash_MEMLIMIT_MIN);
