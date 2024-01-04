@@ -67,6 +67,8 @@ import Logger from "../Logger/Logger";
 import DefectField from "../Model/CustomField/DefectField";
 import PreconditionFailedError from "../Exception/Http/PreconditionFailedError";
 import EventEmitter from "../Event/EventEmitter";
+import EncryptionService from "../Services/EncryptionService";
+import InvalidRangeError from "../Exception/Services/InvalidRangeError";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -120,13 +122,14 @@ export default class DefaultClassLoader extends BasicClassLoader {
 
             'encryption.none' : () => { return new NoEncryption(this.getInstance('classes')); },
             'encryption.csev1': () => { return new CSEv1Encryption(this.getInstance('classes')); },
-            'encryption.expv1': () => { return new ExportV1Encryption(this.getInstance('classes')); },
+            'encryption.expv1': () => { return new ExportV1Encryption(this.getInstance('service.encryption')); },
 
             'keychain.csev1': (k, p) => { return new CSEv1Keychain(this.getInstance('classes'), k, p); },
 
-            'service.hash'    : () => { return new HashService(this.getInstance('classes')); },
+            'service.hash'    : () => { return new HashService(this.getInstance('client')); },
             'service.model'   : () => { return new ModelService(this.getInstance('classes')); },
             'service.password': () => { return new PasswordService(this.getInstance('client')); },
+            'service.encryption': () => { return new EncryptionService(this.getInstance('classes')); },
 
             'logger': Logger,
 
@@ -160,6 +163,7 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'exception.encryption.key.missing': MissingEncryptionKeyError,
             'exception.encryption.text.length': InvalidEncryptedTextLength,
             'exception.configuration'         : ConfigurationError,
+            'exception.service.range'         : InvalidRangeError,
 
 
             // Old deprecated errors
