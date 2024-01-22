@@ -837,6 +837,12 @@ export default class SimpleApi {
         if(path.indexOf('api/api') !== -1) {
             path = path.replace('api/api', 'api');
         }
+        if(path.indexOf('api/link') !== -1) {
+            path = path.replace('api/link', 'api');
+        }
+        if(path.indexOf('api/cron') !== -1) {
+            path = path.replace('api/cron', 'api');
+        }
 
         return path;
     }
