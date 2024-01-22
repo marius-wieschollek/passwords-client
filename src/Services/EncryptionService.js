@@ -2,18 +2,43 @@ import sodium from 'libsodium-wrappers';
 
 export default class EncryptionService {
 
-    constructor() {
+    /**
+     *
+     * @param {BasicClassLoader} classLoader
+     */
+    constructor(classLoader) {
+        this._ready = classLoader.getClass('state.boolean', false);
+        this._classLoader = classLoader;
+
+        sodium.ready.then(() => {this._ready.set(true);});
+    }
+
+    /**
+     *
+     * @returns {Promise<Boolean>}
+     */
+    async ready() {
+        await this._ready.awaitTrue();
+        return true;
+    }
+
+    /**
+     * @returns {Boolean}
+     */
+    enabled() {
+        return this._ready.get();
     }
 
     /**
      * Encrypt the message with the given key and return a hex encoded string
      *
      * @param {String} message
-     * @param {String} key
+     * @param {String} passphrase
      * @returns {String}
-     * @private
      */
     encrypt(message, passphrase) {
+        if(!this.enabled()) throw this._classLoader.getClass('exception.encryption.enabled');
+
         let {key, salt} = this._passwordToKey(passphrase);
         let encrypted = this._encrypt(message, key);
 
@@ -21,18 +46,46 @@ export default class EncryptionService {
     }
 
     /**
-     * Decrypt the hex or base64 encoded message with the given key
+     * Decrypt the hex encoded message with the given key
      *
-     * @param {String} encodedString
-     * @param {Uint8Array} key
+     * @param {String} message
+     * @param {Uint8Array} passphrase
      * @returns {String}
-     * @private
      */
-    _decryptString(encodedString, passphrase) {
-        let salt = encodedString.slice(0, sodium.crypto_pwhash_SALTBYTES),
+    decrypt(message, passphrase) {
+        if(!this.enabled()) throw this._classLoader.getClass('exception.encryption.enabled');
+
+        let encodedString = sodium.from_hex(message),
+            salt = encodedString.slice(0, sodium.crypto_pwhash_SALTBYTES),
             text = encodedString.slice(sodium.crypto_pwhash_SALTBYTES),
-            key  = this._passwordToKey(passphrase, salt);
+            {key, }  = this._passwordToKey(passphrase, salt);
         return sodium.to_string(this._decrypt(text, key));
+    }
+
+
+    /**
+     * Encrypt the message with the given key and return a hex encoded string
+     *
+     * @param {String} message
+     * @param {String} passphrase
+     * @returns {Promise<String>}
+     */
+    async encryptAsync(message, passphrase) {
+        await this.ready();
+        return this.encrypt(message, passphrase);
+    }
+
+
+    /**
+     Decrypt the hex encoded message with the given key
+
+     @param {String} message
+     @param {Uint8Array} passphrase
+     * @returns {Promise<String>}
+     */
+    async decryptAsync(message, passphrase) {
+        await this.ready();
+        return this.decrypt(message, passphrase);
     }
 
     /**
@@ -69,13 +122,15 @@ export default class EncryptionService {
     // noinspection JSMethodCanBeStatic
     /**
      *
-     * @param password
-     * @param salt
-     * @returns {Uint8Array}
+     * @param {String} password
+     * @param {String} salt
+     * @return {{salt: *, key: *}}
      * @private
      */
-    _passwordToKey(password) {
-        let salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
+    _passwordToKey(password, salt = null) {
+        if(salt === null) {
+            salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
+        }
 
         let key = sodium.crypto_pwhash(
             sodium.crypto_box_SEEDBYTES,

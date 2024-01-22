@@ -1,5 +1,5 @@
 import ConfigruationError from '../../Exception/ConfigruationError';
-import Properties from '../../Configuration/Server';
+import Properties from '../../Configuration/Server.json';
 import AbstractModel from './../AbstractModel';
 import ObjectMerger from '../../Utility/ObjectMerger';
 

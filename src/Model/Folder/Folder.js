@@ -1,4 +1,4 @@
-import Properties from '../../Configuration/Folder';
+import Properties from '../../Configuration/Folder.json';
 import AbstractRevisionModel from '../AbstractRevisionModel';
 
 export default class Folder extends AbstractRevisionModel {

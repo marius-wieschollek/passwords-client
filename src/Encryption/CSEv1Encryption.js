@@ -165,6 +165,13 @@ export default class CSEv1Encryption {
     }
 
     /**
+     * @return {CSEv1Keychain}
+     */
+    getKeychain() {
+        return this._keychain;
+    }
+
+    /**
      * Remove the current keychain
      */
     unsetKeychain() {
