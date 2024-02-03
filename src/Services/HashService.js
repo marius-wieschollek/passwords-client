@@ -71,6 +71,7 @@ export default class HashService {
         let response = await this._client.getRequest()
             .setPath('1.0/service/hashes')
             .setData({range})
+            .setAcceptedStatusCodes([200, 404])
             .send();
 
         this._breachedHashesCache[range] = response.getData();
