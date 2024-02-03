@@ -16,6 +16,7 @@ export default class ApiRequest {
         this._method = null;
         this._userAgent = null;
         this._session = session;
+        this._acceptedStatusCodes = null;
         this._responseType = 'application/json';
     }
 
@@ -112,6 +113,25 @@ export default class ApiRequest {
     }
 
     /**
+     * @param {(Number[]|null)} value
+     *
+     * @return {ApiRequest}
+     */
+    setAcceptedStatusCodes(value) {
+        this._acceptedStatusCodes = value;
+
+        return this;
+    }
+
+    /**
+     *
+     * @return {(Number[]|null)}
+     */
+    getAcceptedStatusCodes() {
+        return this._acceptedStatusCodes;
+    }
+
+    /**
      *
      * @returns {Promise<ApiResponse>}
      */
@@ -128,7 +148,7 @@ export default class ApiRequest {
 
         this._updateSessionId(httpResponse);
 
-        if(!httpResponse.ok) {
+        if(!this._isRequestOk(httpResponse)) {
             let error = this._getHttpError(httpResponse);
             this._api.emit('request.error', error);
             throw error;
@@ -153,7 +173,21 @@ export default class ApiRequest {
 
     /**
      *
-     * @param httpResponse
+     * @param {Response} httpResponse
+     * @return {boolean}
+     * @private
+     */
+    _isRequestOk(httpResponse) {
+        if(this._acceptedStatusCodes !== null) {
+            return this._acceptedStatusCodes.indexOf(httpResponse.status) !== -1;
+        }
+
+        return httpResponse.ok;
+    }
+
+    /**
+     *
+     * @param {Response} httpResponse
      * @private
      */
     _updateSessionId(httpResponse) {
