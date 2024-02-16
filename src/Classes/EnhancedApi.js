@@ -1016,6 +1016,10 @@ export default class EnhancedApi extends SimpleApi {
     async _processTagList(data) {
         let tags = {};
 
+        if(!Array.isArray(data) && typeof data === 'object' && data !== null) {
+            return data;
+        }
+
         for(let i = 0; i < data.length; i++) {
             let tag = await this._processTag(data[i]);
             tags[tag.id] = tag;
