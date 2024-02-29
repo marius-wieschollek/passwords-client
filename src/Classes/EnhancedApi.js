@@ -220,10 +220,11 @@ export default class EnhancedApi extends SimpleApi {
         object.hash = await this.getHash(data.password);
         if(!object.label) this._generatePasswordTitle(object);
 
-        if(!object._encrypted && this.hasEncryption && object.cseType !== 'none') {
+        if(!object._encrypted && this.hasEncryption && object.cseType !== 'none' && (!data.hasOwnProperty('shared') || !data.shared)) {
             let encryption = this._client.getCseV1Encryption();
             object = await encryption.encrypt(object, 'password');
         } else {
+            object.cseType = 'none';
             object.cseKey = '';
         }
 
