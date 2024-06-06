@@ -1,4 +1,5 @@
 import ApiResponse from './ApiResponse';
+import Base64Utility from "../Utility/Base64Utility";
 
 export default class ApiRequest {
 
@@ -231,9 +232,9 @@ export default class ApiRequest {
         let headers = new Headers();
 
         if(this._session.getUser() !== null) {
-            headers.append('authorization', `Basic ${btoa(`${this._session.getUser()}:${this._session.getToken()}`)}`);
+            headers.append('authorization', `Basic ${Base64Utility.encode(`${this._session.getUser()}:${this._session.getToken()}`)}`);
         } else if(this._session.getToken() !== null) {
-            headers.append('authorization', `Bearer ${btoa(this._session.getToken())}`);
+            headers.append('authorization', `Bearer ${Base64Utility.encode(this._session.getToken())}`);
         }
 
         headers.append('accept', this._responseType);
