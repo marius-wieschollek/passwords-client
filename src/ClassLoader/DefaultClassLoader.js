@@ -69,6 +69,9 @@ import PreconditionFailedError from "../Exception/Http/PreconditionFailedError";
 import EventEmitter from "../Event/EventEmitter";
 import EncryptionService from "../Services/EncryptionService";
 import InvalidRangeError from "../Exception/Services/InvalidRangeError";
+import ThrottledApiRequest from "../Network/ThrottledApiRequest";
+import ThrottledQueue from "../Queue/ThrottledQueue";
+import FaviconService from "../Services/FaviconService";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -111,6 +114,7 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'model.setting'    : Setting,
 
             'network.request' : ApiRequest,
+            'network.request.throttled': ThrottledApiRequest,
             'network.response': ApiResponse,
 
             'authorization.session': () => { return new SessionAuthorization(this.getInstance('client')); },
@@ -130,6 +134,7 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'service.model'   : () => { return new ModelService(this.getInstance('classes')); },
             'service.password': () => { return new PasswordService(this.getInstance('client')); },
             'service.encryption': () => { return new EncryptionService(this.getInstance('classes')); },
+            'service.favicon': (f=null) => { return new FaviconService(this.getInstance('client'), f); },
 
             'logger': Logger,
 
@@ -138,6 +143,8 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'state.boolean': BooleanState,
 
             'event.event': EventEmitter,
+
+            'queue.throttled': ThrottledQueue,
 
             'exception.response.contenttype'  : ResponseContentTypeError,
             'exception.response.decoding'     : ResponseDecodingError,

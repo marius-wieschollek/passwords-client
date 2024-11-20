@@ -28,15 +28,7 @@ export default class EnhancedPassword extends Password {
      * @return {String}
      */
     getFaviconUrl(size = 32, pathOnly = false) {
-        let host = 'default';
-
-        if(this.getUrl()) {
-            let url = Url(this.getUrl());
-
-            if(url.host.length !== 0) {
-                host = url.host;
-            }
-        }
+        let host = this.getHost() ?? 'default';
 
         if(pathOnly) return `1.0/service/favicon/${host}/${size}`;
 
@@ -64,15 +56,7 @@ export default class EnhancedPassword extends Password {
      * @return {String}
      */
     getPreviewUrl(width = 640, height = '360...', view = 'desktop', pathOnly = false) {
-        let host = 'default';
-
-        if(this.getUrl()) {
-            let url = Url(this.getUrl());
-
-            if(url.host.length !== 0) {
-                host = url.host;
-            }
-        }
+        let host = this.getHost() ?? 'default';
 
         if(pathOnly) return `1.0/service/preview/${host}/${view}/${width}/${height}`;
 
@@ -91,6 +75,21 @@ export default class EnhancedPassword extends Password {
             response = await this._api.getRequest().setPath(path).setResponseType('image/jpeg').send();
 
         return response.getData();
+    }
+
+    /**
+     * @return {String|null}
+     */
+    getHost() {
+        if(this.getUrl()) {
+            let url = Url(this.getUrl());
+
+            if(url.host.length !== 0) {
+                return url.host;
+            }
+        }
+
+        return null;
     }
 
     /**

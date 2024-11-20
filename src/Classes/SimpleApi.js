@@ -1,3 +1,4 @@
+import Base64Utility from "../Utility/Base64Utility";
 const config = require('../../package.json');
 
 export default class SimpleApi {
@@ -801,7 +802,7 @@ export default class SimpleApi {
             headers.append(header, this._headers[header]);
         }
         headers.append('Accept', dataType);
-        headers.append('Authorization', `Basic ${btoa(`${this._client.getServer().getUser()}:${this._client.getServer().getToken()}`)}`);
+        headers.append('Authorization', `Basic ${Base64Utility.encode(`${this._client.getServer().getUser()}:${this._client.getServer().getToken()}`)}`);
         headers.append('x-api-session', this._client.getSession().getId());
 
         let options = {method, headers, credentials: 'omit', redirect: 'error'};
