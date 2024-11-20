@@ -83,13 +83,19 @@ export default class BasicPasswordsClient {
 
     /**
      *
+     * @param {(String|null)} path
+     * @param {String} [type=request]
+     * @param args
      * @return {ApiRequest}
      */
-    getRequest() {
+    getRequest(path = null, type = 'request', ...args) {
         /** @type {ApiRequest} **/
-        let request = this._classes.getClass('network.request', this, this._server.getApiUrl(), this.getSession());
+        let request = this._classes.getClass(`network.${type}`, this, this._server.getApiUrl(), this.getSession(), ...args);
         if(this._config.userAgent !== null) {
             request.setUserAgent(this._config.userAgent);
+        }
+        if(path !== null) {
+            request.setPath(path)
         }
 
         return request;

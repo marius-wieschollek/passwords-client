@@ -266,7 +266,11 @@ export default class ApiRequest {
             let request = new Request(url, options);
             this._api.emit('request.before', request);
 
-            return await fetch(request);
+            /**
+             * Sending options twice to fix Nextcloud bug
+             * where options from the Request object are discarded
+             */
+            return await fetch(request, options);
         } catch(e) {
             this._api.emit('request.error', e);
             throw e;
