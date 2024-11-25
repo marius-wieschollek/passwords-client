@@ -2,7 +2,7 @@ export default class FaviconService {
 
     /**
      * @param {BasicPasswordsClient} client
-     * @param {(String|null)} fallbackIcon
+     * @param {(Blob|String|null)} fallbackIcon
      */
     constructor(client, fallbackIcon = null) {
         this._favicons = {};
@@ -16,7 +16,7 @@ export default class FaviconService {
      *
      * @param {String} domain
      * @param {Number} size
-     * @return {Promise<(String|null)>}
+     * @return {Promise<(Blob|String|null)>}
      */
     get(domain, size = 32) {
         if(this._favicons.hasOwnProperty(`${domain}_${size}`)) {
@@ -30,7 +30,7 @@ export default class FaviconService {
      *
      * @param {String} domain
      * @param {Number} size
-     * @return {Promise<String>}
+     * @return {Promise<(Blob|String|null)>}
      */
     async fetch(domain, size = 32) {
         if(this._favicons.hasOwnProperty(`${domain}_${size}`)) {
@@ -74,16 +74,17 @@ export default class FaviconService {
             /** @type {Blob} favicon **/
             let favicon = await this._sendFaviconRequest(domain, size);
 
-            if(favicon.type.substr(0, 6) !== 'image/' || favicon.size < 1) {
+            if(favicon.type.substring(0, 6) !== 'image/' || favicon.size < 1) {
                 delete this._requests[`${domain}_${size}`];
 
                 if(!this._favicons.hasOwnProperty(`${domain}_${size}`)) {
                     this._favicons[`${domain}_${size}`] = this._fallbackIcon;
                 }
+
                 return this._fallbackIcon;
             }
 
-            this._favicons[`${domain}_${size}`] = URL.createObjectURL(favicon);
+            this._favicons[`${domain}_${size}`] = favicon;
             delete this._requests[`${domain}_${size}`];
 
             return this._favicons[`${domain}_${size}`];
@@ -109,7 +110,7 @@ export default class FaviconService {
         if(domain === null || domain.length === 0) domain = 'default';
         domain = encodeURIComponent(domain);
 
-        let path = `1.0/service/favicon/${domain}/${size}`,
+        let path    = `1.0/service/favicon/${domain}/${size}`,
             request = this._client.getRequest(path, 'request.throttled', 'favicon');
         request.setResponseType('image/png');
 
