@@ -5,7 +5,9 @@ export default class ThrottledApiRequest extends ApiRequest {
     static namedQueues = {};
     static queueConfigs = {
         'default': {concurrent: 5, timeframe: 5},
-        'favicon': {concurrent: 15, timeframe: 15}
+        'favicon': {concurrent: 15, timeframe: 15},
+        'preview': {concurrent: 10, timeframe: 30},
+        'avatar': {concurrent: 15, timeframe: 15}
     };
 
     /**

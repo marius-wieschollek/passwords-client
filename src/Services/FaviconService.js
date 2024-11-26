@@ -70,30 +70,31 @@ export default class FaviconService {
      * @private
      */
     async _fetchFavicon(domain, size) {
+        let cacheKey = `${domain}_${size}`;
         try {
             /** @type {Blob} favicon **/
             let favicon = await this._sendFaviconRequest(domain, size);
 
             if(favicon.type.substring(0, 6) !== 'image/' || favicon.size < 1) {
-                delete this._requests[`${domain}_${size}`];
+                delete this._requests[cacheKey];
 
-                if(!this._favicons.hasOwnProperty(`${domain}_${size}`)) {
-                    this._favicons[`${domain}_${size}`] = this._fallbackIcon;
+                if(!this._favicons.hasOwnProperty(cacheKey)) {
+                    this._favicons[cacheKey] = this._fallbackIcon;
                 }
 
                 return this._fallbackIcon;
             }
 
-            this._favicons[`${domain}_${size}`] = favicon;
-            delete this._requests[`${domain}_${size}`];
+            this._favicons[cacheKey] = favicon;
+            delete this._requests[cacheKey];
 
-            return this._favicons[`${domain}_${size}`];
+            return this._favicons[cacheKey];
         } catch(e) {
-            if(this._requests.hasOwnProperty(`${domain}_${size}`)) {
-                delete this._requests[`${domain}_${size}`];
+            if(this._requests.hasOwnProperty(cacheKey)) {
+                delete this._requests[cacheKey];
             }
-            if(!this._favicons.hasOwnProperty(`${domain}_${size}`)) {
-                this._favicons[`${domain}_${size}`] = this._fallbackIcon;
+            if(!this._favicons.hasOwnProperty(cacheKey)) {
+                this._favicons[cacheKey] = this._fallbackIcon;
             }
             return this._fallbackIcon;
         }
