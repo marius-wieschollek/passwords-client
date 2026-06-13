@@ -912,7 +912,7 @@ export default class EnhancedApi extends SimpleApi {
         password._encrypted = false;
         password.type = 'password';
         if(password.url) {
-            let host    = this.parseUrl(password.url, 'host'),
+            let host    = this.parseUrl(password.url, 'hostname'),
                 imgHost = this._removeCommonSubdomains(host),
                 website = this._getWebsiteNameFromDomain(host);
             password.host = host;
@@ -1105,7 +1105,7 @@ export default class EnhancedApi extends SimpleApi {
      */
     _generatePasswordTitle(data) {
         if(data.url) {
-            data.label = this._getWebsiteNameFromDomain(this.parseUrl(data.url, 'host'));
+            data.label = this._getWebsiteNameFromDomain(this.parseUrl(data.url, 'hostname'));
 
             if(data.username) {
                 let username = String(data.username);
