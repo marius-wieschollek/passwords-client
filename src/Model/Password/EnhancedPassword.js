@@ -41,8 +41,7 @@ export default class EnhancedPassword extends Password {
      * @returns {Promise<Blob>}
      */
     async getFavicon(size = 32) {
-        let path = this.getFaviconUrl(size, true),
-            response = await this._api.getRequest().setPath(path).setResponseType('image/png').send();
+        let response = await this._api.getInstance('service.favicon', null).get(this.getHost(), size);
 
         return response.getData();
     }
@@ -70,9 +69,8 @@ export default class EnhancedPassword extends Password {
      * @param {String} view
      * @returns {Promise<Blob>}
      */
-    async getPreview(width = 640, height = '360...', view) {
-        let path = this.getPreviewUrl(width, height, view, true),
-            response = await this._api.getRequest().setPath(path).setResponseType('image/jpeg').send();
+    async getPreview(width = 640, height = '360...', view = 'desktop') {
+        let response = await this._api.getInstance('service.preview', null).get(this.getHost(), view, width, height);
 
         return response.getData();
     }
@@ -84,8 +82,8 @@ export default class EnhancedPassword extends Password {
         if(this.getUrl()) {
             let url = Url(this.getUrl());
 
-            if(url.host.length !== 0) {
-                return url.host;
+            if(url.length !== 0) {
+                return url.hostname;
             }
         }
 

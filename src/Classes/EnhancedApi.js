@@ -1134,6 +1134,10 @@ export default class EnhancedApi extends SimpleApi {
      * @private
      */
     _getWebsiteNameFromDomain(domain) {
+        if(domain.match(/^[0-9.]+$$/gm)) {
+            return domain;
+        }
+
         if((domain.match(/\./g) || []).length > 2) {
             let array = domain.split('.');
             domain = '';

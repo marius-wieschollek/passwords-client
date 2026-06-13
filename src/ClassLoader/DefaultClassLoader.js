@@ -72,6 +72,9 @@ import InvalidRangeError from "../Exception/Services/InvalidRangeError";
 import ThrottledApiRequest from "../Network/ThrottledApiRequest";
 import ThrottledQueue from "../Queue/ThrottledQueue";
 import FaviconService from "../Services/FaviconService";
+import PreviewService from "../Services/PreviewService";
+import AvatarService from "../Services/AvatarService";
+import InvalidOptionsError from "../Exception/Services/InvalidOptionsError";
 
 export default class DefaultClassLoader extends BasicClassLoader {
 
@@ -135,6 +138,8 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'service.password': () => { return new PasswordService(this.getInstance('client')); },
             'service.encryption': () => { return new EncryptionService(this.getInstance('classes')); },
             'service.favicon': (f=null) => { return new FaviconService(this.getInstance('client'), f); },
+            'service.preview': (f=null) => { return new PreviewService(this.getInstance('client'), f); },
+            'service.avatar': (f=null) => { return new AvatarService(this.getInstance('client'), f); },
 
             'logger': Logger,
 
@@ -171,6 +176,7 @@ export default class DefaultClassLoader extends BasicClassLoader {
             'exception.encryption.text.length': InvalidEncryptedTextLength,
             'exception.configuration'         : ConfigurationError,
             'exception.service.range'         : InvalidRangeError,
+            'exception.service.options'       : InvalidOptionsError,
 
 
             // Old deprecated errors
