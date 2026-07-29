@@ -36,6 +36,8 @@ export default class SimpleApi {
             'share.update'           : 'api/1.0/share/update',
             'share.delete'           : 'api/1.0/share/delete',
             'share.partners'         : 'api/1.0/share/partners',
+            'share.recipients'       : 'api/1.0/share/recipients',
+            'share.resolve-group'    : 'api/1.0/share/recipients/resolve-group',
             'client.list'            : 'api/1.0/client/list',
             'client.show'            : 'api/1.0/client/show',
             'client.create'          : 'api/1.0/client/create',
@@ -470,10 +472,28 @@ export default class SimpleApi {
     /**
      *
      * @returns {Promise}
+     * @deprecated
      */
     findSharePartners(search = '', limit = 5) {
         if(search.length === 0 && limit === 5) return this._sendRequest('share.partners');
         return this._sendRequest('share.partners', {search, limit}, 'POST');
+    }
+
+    /**
+     *
+     * @returns {Promise}
+     */
+    findShareRecipients(search = '', limit = 5, withGroups = true) {
+        if(search.length === 0 && limit === 5 && withGroups) return this._sendRequest('share.recipients');
+        return this._sendRequest('share.recipients', {search, limit, withGroups}, 'POST');
+    }
+
+    /**
+     *
+     * @returns {Promise}
+     */
+    resolveGroup(groupId) {
+        return this._sendRequest('share.resolve-group', {groupId}, 'POST');
     }
 
 
