@@ -30,13 +30,14 @@ export default class EnhancedApi extends SimpleApi {
      * Initialize the api object
      *
      * @param {BasicPasswordsClient} client
+     * @param config
      */
     initialize(client, config = {}) {
         config.baseUrl = client.getServer().getBaseUrl();
 
         if(!config.folderIcon) config.folderIcon = `${config.baseUrl}core/img/filetypes/folder.svg`;
         if(!config.apiUrl) config.apiUrl = `${config.baseUrl}index.php/apps/passwords/`;
-        if(!config.hashLength) config.hashLength = 40;
+        if(!config.hasOwnProperty('hashLength') || config.hashLength < 0 || config.hashLength > 40) config.hashLength = 40;
         if(!config.cseMode || ['none', 'CSEv1r1'].indexOf(config.cseMode) === -1) config.cseMode = 'none';
 
         if(!config.device) {
