@@ -16,7 +16,7 @@ export default class FaviconService {
      *
      * @param {String} domain
      * @param {Number} size
-     * @return {Promise<(Blob|String|null)>}
+     * @return {(Blob|String|null)}
      */
     get(domain, size = 32) {
         if(this._favicons.hasOwnProperty(`${domain}_${size}`)) {
