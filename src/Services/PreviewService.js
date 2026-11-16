@@ -18,7 +18,7 @@ export default class PreviewService {
      * @param {String} [view="desktop"]
      * @param {(Number|String)} [width="640"]
      * @param {(Number|String)} [height="360..."]
-     * @return {Promise<(Blob|String|null)>}
+     * @return {(Blob|String|null)}
      */
     get(domain, view = 'desktop', width = '640', height = '360...') {
         this._validateInput(view, width, height);

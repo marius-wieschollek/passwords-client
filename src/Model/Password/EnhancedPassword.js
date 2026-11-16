@@ -38,12 +38,19 @@ export default class EnhancedPassword extends Password {
     /**
      *
      * @param size
-     * @returns {Promise<Blob>}
+     * @returns {(Blob|null)}
      */
-    async getFavicon(size = 32) {
-        let response = await this._api.getInstance('service.favicon', null).get(this.getHost(), size);
+    getFavicon(size = 32) {
+        return this._api.getInstance('service.favicon', null).get(this.getHost(), size);
+    }
 
-        return response.getData();
+    /**
+     *
+     * @param size
+     * @returns {Promise<Blob|null>}
+     */
+    async fetchFavicon(size = 32) {
+        return await this._api.getInstance('service.favicon', null).fetch(this.getHost(), size);
     }
 
     /**
@@ -67,12 +74,21 @@ export default class EnhancedPassword extends Password {
      * @param {(String|Number)} width
      * @param {(String|Number)} height
      * @param {String} view
-     * @returns {Promise<Blob>}
+     * @returns {Promise<(Blob|null)>}
      */
     async getPreview(width = 640, height = '360...', view = 'desktop') {
-        let response = await this._api.getInstance('service.preview', null).get(this.getHost(), view, width, height);
+        return this._api.getInstance('service.preview', null).get(this.getHost(), view, width, height);
+    }
 
-        return response.getData();
+    /**
+     *
+     * @param {(String|Number)} width
+     * @param {(String|Number)} height
+     * @param {String} view
+     * @returns {Promise<(Blob|null)>}
+     */
+    async fetchPreview(width = 640, height = '360...', view = 'desktop') {
+        return await this._api.getInstance('service.preview', null).fetch(this.getHost(), view, width, height);
     }
 
     /**
